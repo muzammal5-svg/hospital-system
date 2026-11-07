@@ -1,7 +1,15 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { formatPKR, formatDate } from "@/lib/utils";
+import React, { useState, useEffect } from 'react';
+import { formatPKR, formatDate } from '@/lib/utils';
+import {
+  PageHeader,
+  Card,
+  CardHeader,
+  StatusChip,
+  Avatar,
+  useToast,
+} from '@/components/ui-app';
 import {
   Tv,
   Bell,
@@ -12,7 +20,11 @@ import {
   ArrowRight,
   Filter,
   Volume2,
-} from "lucide-react";
+  ExternalLink,
+  ShieldAlert,
+  UserCheck,
+  RotateCcw,
+} from 'lucide-react';
 
 interface QueueClientProps {
   initialVisits: any[];
@@ -20,13 +32,14 @@ interface QueueClientProps {
 }
 
 export default function QueueClient({ initialVisits, doctors }: QueueClientProps) {
+  const toast = useToast();
   const [visits, setVisits] = useState(initialVisits);
-  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [selectedDoctor, setSelectedDoctor] = useState('');
   const [callingId, setCallingId] = useState<string | null>(null);
 
   const fetchVisits = async () => {
     try {
-      const res = await fetch("/api/visits");
+      const res = await fetch('/api/visits');
       const data = await res.json();
       if (data.visits) {
         setVisits(data.visits);
@@ -38,7 +51,7 @@ export default function QueueClient({ initialVisits, doctors }: QueueClientProps
 
   useEffect(() => {
     // Connect to SSE stream for live updates
-    const eventSource = new EventSource("/api/queue/stream");
+    const eventSource = new EventSource('/api/queue/stream');
     eventSource.onmessage = () => {
       fetchVisits();
     };
@@ -48,10 +61,11 @@ export default function QueueClient({ initialVisits, doctors }: QueueClientProps
   const handleCallPatient = async (visitId: string) => {
     setCallingId(visitId);
     try {
-      const res = await fetch(`/api/visits/${visitId}/call`, { method: "POST" });
+      const res = await fetch(`/api/visits/${visitId}/call`, { method: 'POST' });
       const data = await res.json();
       if (res.ok) {
         fetchVisits();
+        toast.success('Patient Called', `Token #${data.visit?.tokenNumber} called to room.`);
       }
     } catch (e) {
       console.error(e);
@@ -63,11 +77,12 @@ export default function QueueClient({ initialVisits, doctors }: QueueClientProps
   const handleStatusChange = async (visitId: string, status: string, priority?: string) => {
     try {
       await fetch(`/api/visits/${visitId}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, priority }),
       });
       fetchVisits();
+      toast.info('Status Updated', `Patient marked as ${status}`);
     } catch (e) {
       console.error(e);
     }
@@ -77,124 +92,130 @@ export default function QueueClient({ initialVisits, doctors }: QueueClientProps
     (v) => !selectedDoctor || v.doctorId === selectedDoctor
   );
 
-  const waitingList = filteredVisits.filter((v) => v.status === "WAITING");
-  const inConsultationList = filteredVisits.filter((v) => v.status === "IN_CONSULTATION");
-  const completedList = filteredVisits.filter((v) => v.status === "COMPLETED");
+  const waitingList = filteredVisits.filter((v) => v.status === 'WAITING');
+  const inConsultationList = filteredVisits.filter((v) => v.status === 'IN_CONSULTATION');
+  const completedList = filteredVisits.filter((v) => v.status === 'COMPLETED');
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display font-extrabold text-2xl tracking-tight text-neutral-900 dark:text-white">
-            Live OPD Queue Board
-          </h1>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-            Real-time status board synchronized with waiting room TV displays.
-          </p>
-        </div>
+      <PageHeader
+        title="Live OPD Queue Status"
+        subtitle="Real-time waiting room orchestration synchronized with TV displays and audio chime."
+        breadcrumbs={[
+          { label: 'Hospital', href: '/dashboard' },
+          { label: 'Live Queue' },
+        ]}
+        actions={
+          <div className="flex items-center gap-3">
+            <select
+              value={selectedDoctor}
+              onChange={(e) => setSelectedDoctor(e.target.value)}
+              className="h-10 rounded-lg border border-[#D5DDE5] bg-white px-3 text-xs font-semibold text-[#1B2733] shadow-2xs focus:border-[#0B4F8A] focus:outline-none"
+            >
+              <option value="">All Consultants ({doctors.length})</option>
+              {doctors.map((d) => (
+                <option key={d.id} value={d.id}>
+                  Dr. {d.name} ({d.room || d.roomNo || 'Room 101'})
+                </option>
+              ))}
+            </select>
 
-        <div className="flex items-center gap-3">
-          {/* Doctor filter */}
-          <select
-            value={selectedDoctor}
-            onChange={(e) => setSelectedDoctor(e.target.value)}
-            className="bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-xs font-semibold text-neutral-900 dark:text-white outline-none"
-          >
-            <option value="">All Doctors ({doctors.length})</option>
-            {doctors.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name} ({d.roomNo})
-              </option>
-            ))}
-          </select>
+            <a
+              href="/display"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#0B4F8A] px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#093F6E] transition-colors"
+            >
+              <Tv className="h-4 w-4" />
+              <span>Open TV Display</span>
+              <ExternalLink className="h-3 w-3 opacity-80" />
+            </a>
+          </div>
+        }
+      />
 
-          <a
-            href="/display"
-            target="_blank"
-            className="btn-pill bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/20 text-xs font-bold gap-2"
-          >
-            <Tv className="w-4 h-4" />
-            <span>Open TV Screen</span>
-          </a>
-        </div>
-      </div>
-
-      {/* 3-Column Kanban Board (Waiting / In Consultation / Completed) */}
+      {/* 3-Column Kanban Board */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* Col 1: Waiting */}
-        <div className="rounded-2xl bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 p-5 shadow-card-soft space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-white/10">
+        {/* Column 1: Waiting */}
+        <div className="rounded-xl border border-[#E3E9EF] bg-white p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-[#F0F4F8] pb-3">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-              <h3 className="font-bold text-sm text-neutral-900 dark:text-white">Waiting in Lobby</h3>
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+              <h3 className="font-heading text-sm font-bold text-[#1B2733]">
+                Waiting in Lobby
+              </h3>
             </div>
-            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300">
+            <span className="rounded-full bg-amber-50 px-2.5 py-0.5 font-mono text-xs font-bold text-amber-800">
               {waitingList.length}
             </span>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[720px] overflow-y-auto pr-1">
             {waitingList.length === 0 ? (
-              <div className="py-8 text-center text-xs text-neutral-400">
+              <div className="py-12 text-center text-xs text-[#8A97A5]">
                 No patients waiting in queue.
               </div>
             ) : (
               waitingList.map((v) => {
-                const isEmergency = v.priority === "EMERGENCY";
+                const isEmergency = v.priority === 'EMERGENCY';
                 return (
                   <div
                     key={v.id}
-                    className={`p-4 rounded-xl border transition-all ${
+                    className={`rounded-xl border p-4 transition-all ${
                       isEmergency
-                        ? "bg-red-50 dark:bg-red-950/30 border-red-300 dark:border-red-800"
-                        : "bg-neutral-50 dark:bg-[#11171E] border-neutral-200 dark:border-white/5"
+                        ? 'border-rose-300 bg-rose-50/60 shadow-xs'
+                        : 'border-[#E3E9EF] bg-[#FBFDFF] hover:border-[#B5CDE0] hover:bg-white'
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <span className="font-display font-black text-2xl text-neutral-900 dark:text-white">
-                          #{String(v.tokenNumber).padStart(2, "0")}
+                      <div className="flex items-center gap-3">
+                        <span className="font-heading text-2xl font-black text-[#0B4F8A]">
+                          #{String(v.tokenNumber).padStart(2, '0')}
                         </span>
                         <div>
-                          <span className="font-bold text-xs text-neutral-900 dark:text-white block">
-                            {v.patient.fullName}
+                          <span className="font-bold text-xs text-[#1B2733] block">
+                            {v.patient?.fullName || v.patient?.name}
                           </span>
-                          <span className="text-[11px] text-neutral-500">
-                            Dr. {v.doctor.name} ({v.doctor.roomNo})
+                          <span className="text-[11px] text-[#5B6B7B]">
+                            Dr. {v.doctor?.name} ({v.doctor?.room || v.doctor?.roomNo || 'Room 101'})
                           </span>
                         </div>
                       </div>
 
                       {isEmergency && (
-                        <span className="px-2 py-0.5 rounded text-[10px] bg-red-600 text-white font-black animate-pulse">
+                        <span className="rounded bg-rose-600 px-2 py-0.5 text-[10px] font-black text-white animate-pulse">
                           EMERGENCY
                         </span>
                       )}
                     </div>
 
-                    {/* Actions row */}
-                    <div className="mt-4 pt-3 border-t border-neutral-200/50 dark:border-white/5 flex items-center justify-between">
+                    <div className="mt-3.5 pt-2.5 border-t border-[#F0F4F8] flex items-center justify-between text-xs">
                       <button
+                        type="button"
                         onClick={() =>
                           handleStatusChange(
                             v.id,
-                            "WAITING",
-                            isEmergency ? "NORMAL" : "EMERGENCY"
+                            'WAITING',
+                            isEmergency ? 'NORMAL' : 'EMERGENCY'
                           )
                         }
-                        className="text-[11px] text-neutral-500 hover:text-red-500 font-semibold"
+                        className={`text-[11px] font-semibold ${
+                          isEmergency
+                            ? 'text-[#5B6B7B] hover:text-[#1B2733]'
+                            : 'text-rose-600 hover:text-rose-800'
+                        }`}
                       >
-                        {isEmergency ? "Remove Emergency" : "Mark Emergency"}
+                        {isEmergency ? 'Remove Flag' : 'Mark Emergency'}
                       </button>
 
                       <button
+                        type="button"
                         onClick={() => handleCallPatient(v.id)}
                         disabled={callingId === v.id}
-                        className="px-3 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-600 text-black font-bold text-xs flex items-center gap-1.5 shadow-sm"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-[#1E9E8F] px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-[#167C70] transition-colors disabled:opacity-50"
                       >
-                        <Volume2 className="w-3.5 h-3.5" />
-                        <span>{callingId === v.id ? "Calling..." : "Call Next"}</span>
+                        <Volume2 className="h-3.5 w-3.5" />
+                        <span>{callingId === v.id ? 'Calling...' : 'Call Next'}</span>
                       </button>
                     </div>
                   </div>
@@ -204,58 +225,65 @@ export default function QueueClient({ initialVisits, doctors }: QueueClientProps
           </div>
         </div>
 
-        {/* Col 2: In Consultation */}
-        <div className="rounded-2xl bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 p-5 shadow-card-soft space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-white/10">
+        {/* Column 2: In Consultation */}
+        <div className="rounded-xl border border-[#E3E9EF] bg-white p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-[#F0F4F8] pb-3">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse" />
-              <h3 className="font-bold text-sm text-neutral-900 dark:text-white">In Consultation</h3>
+              <span className="h-2.5 w-2.5 rounded-full bg-blue-600" />
+              <h3 className="font-heading text-sm font-bold text-[#1B2733]">
+                In Consultation
+              </h3>
             </div>
-            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300">
+            <span className="rounded-full bg-blue-50 px-2.5 py-0.5 font-mono text-xs font-bold text-blue-800">
               {inConsultationList.length}
             </span>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[720px] overflow-y-auto pr-1">
             {inConsultationList.length === 0 ? (
-              <div className="py-8 text-center text-xs text-neutral-400">
-                No active consultation in progress.
+              <div className="py-12 text-center text-xs text-[#8A97A5]">
+                No patients currently in consultation.
               </div>
             ) : (
               inConsultationList.map((v) => (
                 <div
                   key={v.id}
-                  className="p-4 rounded-xl border border-blue-200 dark:border-blue-900/40 bg-blue-50/50 dark:bg-blue-950/20"
+                  className="rounded-xl border-2 border-[#0B4F8A] bg-[#E8F1F9]/30 p-4 shadow-sm"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <span className="font-display font-black text-2xl text-blue-600 dark:text-blue-400">
-                        #{String(v.tokenNumber).padStart(2, "0")}
-                      </span>
-                      <div>
-                        <span className="font-bold text-xs text-neutral-900 dark:text-white block">
-                          {v.patient.fullName}
-                        </span>
-                        <span className="text-[11px] text-neutral-500">
-                          {v.doctor.name} • Room {v.doctor.roomNo}
-                        </span>
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-heading text-2xl font-black text-[#0B4F8A]">
+                      #{String(v.tokenNumber).padStart(2, '0')}
+                    </span>
+                    <span className="rounded-full bg-[#0B4F8A] px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+                      Inside Room
+                    </span>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-blue-200/50 dark:border-white/5 flex items-center justify-between">
+                  <div className="mt-2">
+                    <h4 className="font-bold text-sm text-[#1B2733]">
+                      {v.patient?.fullName || v.patient?.name}
+                    </h4>
+                    <p className="text-xs text-[#5B6B7B] mt-0.5">
+                      Consultant: <strong>Dr. {v.doctor?.name}</strong> ({v.doctor?.room || v.doctor?.roomNo || 'Room 101'})
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-[#D5E6F5] flex items-center justify-between">
                     <button
-                      onClick={() => handleCallPatient(v.id)}
-                      className="text-[11px] text-teal-600 dark:text-teal-400 font-bold hover:underline"
+                      type="button"
+                      onClick={() => handleStatusChange(v.id, 'WAITING')}
+                      className="text-[11px] font-semibold text-[#5B6B7B] hover:text-[#1B2733]"
                     >
-                      Re-Call Chime
+                      Return to Waiting
                     </button>
 
                     <button
-                      onClick={() => handleStatusChange(v.id, "COMPLETED")}
-                      className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs"
+                      type="button"
+                      onClick={() => handleStatusChange(v.id, 'COMPLETED')}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition-colors"
                     >
-                      Mark Completed
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      <span>Complete</span>
                     </button>
                   </div>
                 </div>
@@ -264,43 +292,48 @@ export default function QueueClient({ initialVisits, doctors }: QueueClientProps
           </div>
         </div>
 
-        {/* Col 3: Completed Today */}
-        <div className="rounded-2xl bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 p-5 shadow-card-soft space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-white/10">
+        {/* Column 3: Completed */}
+        <div className="rounded-xl border border-[#E3E9EF] bg-white p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-[#F0F4F8] pb-3">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-              <h3 className="font-bold text-sm text-neutral-900 dark:text-white">Completed Consults</h3>
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+              <h3 className="font-heading text-sm font-bold text-[#1B2733]">
+                Completed Today
+              </h3>
             </div>
-            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300">
+            <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-xs font-bold text-emerald-800">
               {completedList.length}
             </span>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[720px] overflow-y-auto pr-1">
             {completedList.length === 0 ? (
-              <div className="py-8 text-center text-xs text-neutral-400">
-                No consultations completed yet today.
+              <div className="py-12 text-center text-xs text-[#8A97A5]">
+                No consultations completed yet.
               </div>
             ) : (
-              completedList.slice(0, 8).map((v) => (
+              completedList.map((v) => (
                 <div
                   key={v.id}
-                  className="p-3 rounded-xl border border-neutral-200 dark:border-white/5 bg-neutral-50 dark:bg-[#11171E] flex items-center justify-between"
+                  className="rounded-xl border border-[#E3E9EF] bg-[#F8FAFC] p-3 text-xs flex items-center justify-between"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-xs">
-                      #{v.tokenNumber}
-                    </span>
-                    <div>
-                      <span className="font-bold text-xs text-neutral-900 dark:text-white block">
-                        {v.patient.fullName}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-[#1B2733]">
+                        #{String(v.tokenNumber).padStart(2, '0')}
                       </span>
-                      <span className="text-[10px] text-neutral-500">
-                        {v.doctor.name}
+                      <span className="font-semibold text-[#1B2733]">
+                        {v.patient?.fullName || v.patient?.name}
                       </span>
                     </div>
+                    <span className="text-[11px] text-[#8A97A5] mt-0.5 block">
+                      Dr. {v.doctor?.name} • Completed
+                    </span>
                   </div>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+
+                  <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                    Done
+                  </span>
                 </div>
               ))
             )}

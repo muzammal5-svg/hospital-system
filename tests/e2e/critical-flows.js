@@ -37,7 +37,7 @@ async function runQA() {
   // TEST AUTH-01: Wrong Password Error
   // --------------------------------------------------------------------------
   try {
-    await page.goto('http://localhost:3000/login', { waitUntil: 'domcontentloaded' });
+    await page.goto('http://localhost:3000/login', { waitUntil: 'networkidle' });
     await page.fill('input[type="email"]', 'admin@naseemijaz.pk');
     await page.fill('input[type="password"]', 'WrongPassword!@#');
     await page.click('button[type="submit"]');
@@ -98,7 +98,7 @@ async function runQA() {
   const recContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const recPage = await recContext.newPage();
   try {
-    await recPage.goto('http://localhost:3000/login', { waitUntil: 'domcontentloaded' });
+    await recPage.goto('http://localhost:3000/login', { waitUntil: 'networkidle' });
     await recPage.fill('input[type="email"]', 'reception@naseemijaz.pk');
     await recPage.fill('input[type="password"]', 'Reception@123');
     await recPage.click('button[type="submit"]');

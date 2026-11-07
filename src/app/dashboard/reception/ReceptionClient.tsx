@@ -1,8 +1,28 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import { formatPKR, formatCNIC, formatMobile } from "@/lib/utils";
-import { PrintThermalReceipt } from "@/components/PrintThermalReceipt";
+import React, { useState, useEffect, useRef } from 'react';
+import { formatPKR, formatCNIC, formatMobile } from '@/lib/utils';
+import { PrintThermalReceipt } from '@/components/PrintThermalReceipt';
+import {
+  Card,
+  CardHeader,
+  StatCard,
+} from '@/components/ui-app/Card';
+import {
+  TextField,
+  PhoneField,
+  CnicField,
+  SelectField,
+  TextareaField,
+  RadioCards,
+  FormSection,
+  FormGrid,
+  FormActions,
+} from '@/components/ui-app/FormControls';
+import { StatusChip } from '@/components/ui-app/StatusChip';
+import { Avatar } from '@/components/ui-app/Avatar';
+import { Modal } from '@/components/ui-app/Modal';
+import { useToast } from '@/components/ui-app/Toast';
 import {
   UserPlus,
   CalendarPlus,
@@ -19,7 +39,11 @@ import {
   ShieldAlert,
   Users,
   FileText,
-} from "lucide-react";
+  CreditCard,
+  Banknote,
+  RotateCcw,
+  Sparkles,
+} from 'lucide-react';
 
 interface ReceptionClientProps {
   initialDepartments: any[];
@@ -32,55 +56,80 @@ export default function ReceptionClient({
   initialDoctors,
   hospitalProfile,
 }: ReceptionClientProps) {
-  const [activeTab, setActiveTab] = useState<"register" | "visit" | "search">("register");
+  const toast = useToast();
+  const [activeTab, setActiveTab] = useState<'register' | 'visit' | 'search'>('register');
 
   // Keyboard shortcuts: F2 = New Patient Intake, F3 = Patient Search, F4 = Issue OPD Token
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "F2") {
+      if (e.key === 'F2') {
         e.preventDefault();
-        setActiveTab("register");
-      } else if (e.key === "F3") {
+        setActiveTab('register');
+      } else if (e.key === 'F3') {
         e.preventDefault();
-        setActiveTab("search");
-      } else if (e.key === "F4") {
+        setActiveTab('search');
+      } else if (e.key === 'F4') {
         e.preventDefault();
-        setActiveTab("visit");
+        setActiveTab('visit');
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Registration Form State
-  const [fullName, setFullName] = useState("");
-  const [fatherOrHusbandName, setFatherOrHusbandName] = useState("");
-  const [age, setAge] = useState("");
-  const [gender, setGender] = useState("MALE");
-  const [cnic, setCnic] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("Lahore");
-  const [bloodGroup, setBloodGroup] = useState("");
-  const [emergencyContact, setEmergencyContact] = useState("");
-  const [allergies, setAllergies] = useState("");
-  const [photoUrl, setPhotoUrl] = useState("");
+  // 1. Search First State
+  const [topSearchQuery, setTopSearchQuery] = useState('');
+  const [topSearchResults, setTopSearchResults] = useState<any[]>([]);
+  const [isTopSearching, setIsTopSearching] = useState(false);
+  const [matchedExistingPatient, setMatchedExistingPatient] = useState<any | null>(null);
+
+  // 2. Personal Information
+  const [fullName, setFullName] = useState('');
+  const [fatherOrHusbandName, setFatherOrHusbandName] = useState('');
+  const [age, setAge] = useState('');
+  const [dob, setDob] = useState('');
+  const [gender, setGender] = useState('MALE');
+  const [maritalStatus, setMaritalStatus] = useState('SINGLE');
+  const [cnic, setCnic] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
+
+  // 3. Contact
+  const [mobile, setMobile] = useState('');
+  const [altPhone, setAltPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('Lahore');
+
+  // 4. Medical Info
+  const [bloodGroup, setBloodGroup] = useState('');
+  const [allergies, setAllergies] = useState('');
+  const [chronicConditions, setChronicConditions] = useState('');
+  const [emergencyContact, setEmergencyContact] = useState('');
+  const [emergencyPhone, setEmergencyPhone] = useState('');
+  const [emergencyRelation, setEmergencyRelation] = useState('');
+
+  // 5. Visit Details
+  const [patientType, setPatientType] = useState('NEW');
+  const [departmentId, setDepartmentId] = useState(initialDepartments[0]?.id || '');
+  const [doctorId, setDoctorId] = useState(initialDoctors[0]?.id || '');
+  const [visitType, setVisitType] = useState('OPD');
+  const [priority, setPriority] = useState('NORMAL');
+  const [visitNotes, setVisitNotes] = useState('');
+
+  // 6. Payment & Billing
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
+  const [discountReason, setDiscountReason] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('CASH');
+  const [amountReceived, setAmountReceived] = useState<number | string>('');
 
   // Live duplicate warning state
   const [duplicateWarning, setDuplicateWarning] = useState<any[]>([]);
 
-  // Visit Form State
+  // Selected patient for visit tab
   const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
-  const [departmentId, setDepartmentId] = useState(initialDepartments[0]?.id || "");
-  const [doctorId, setDoctorId] = useState(initialDoctors[0]?.id || "");
-  const [visitType, setVisitType] = useState("OPD");
-  const [priority, setPriority] = useState("NORMAL");
-  const [discountAmount, setDiscountAmount] = useState<number>(0);
-  const [discountReason, setDiscountReason] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("CASH");
 
-  // Global search state
-  const [searchQuery, setSearchQuery] = useState("");
+  // Master search tab state
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -92,29 +141,115 @@ export default function ReceptionClient({
   const [registeredPatient, setRegisteredPatient] = useState<any | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Webcam capture state
   const [cameraActive, setCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Auto-calculate DOB from Age
+  const handleAgeChange = (val: string) => {
+    setAge(val);
+    const num = parseInt(val, 10);
+    if (!isNaN(num) && num > 0 && num < 125) {
+      const currentYear = new Date().getFullYear();
+      const birthYear = currentYear - num;
+      setDob(`${birthYear}-01-01`);
+    }
+  };
+
+  // Auto-calculate Age from DOB
+  const handleDobChange = (val: string) => {
+    setDob(val);
+    if (val) {
+      const birth = new Date(val);
+      const now = new Date();
+      let diff = now.getFullYear() - birth.getFullYear();
+      const m = now.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) {
+        diff--;
+      }
+      if (diff >= 0 && diff < 125) {
+        setAge(String(diff));
+      }
+    }
+  };
+
+  // Autosave draft to sessionStorage
+  useEffect(() => {
+    try {
+      const draft = {
+        fullName,
+        fatherOrHusbandName,
+        age,
+        gender,
+        cnic,
+        mobile,
+        address,
+        city,
+        bloodGroup,
+        allergies,
+      };
+      if (fullName || mobile || cnic) {
+        sessionStorage.setItem('nih_registration_draft', JSON.stringify(draft));
+      }
+    } catch (e) {}
+  }, [fullName, fatherOrHusbandName, age, gender, cnic, mobile, address, city, bloodGroup, allergies]);
+
+  // Restore draft on mount
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem('nih_registration_draft');
+      if (saved) {
+        const d = JSON.parse(saved);
+        if (d.fullName) setFullName(d.fullName);
+        if (d.fatherOrHusbandName) setFatherOrHusbandName(d.fatherOrHusbandName);
+        if (d.age) setAge(d.age);
+        if (d.gender) setGender(d.gender);
+        if (d.cnic) setCnic(d.cnic);
+        if (d.mobile) setMobile(d.mobile);
+        if (d.address) setAddress(d.address);
+        if (d.city) setCity(d.city);
+        if (d.bloodGroup) setBloodGroup(d.bloodGroup);
+        if (d.allergies) setAllergies(d.allergies);
+      }
+    } catch (e) {}
+  }, []);
+
+  const clearDraft = () => {
+    try {
+      sessionStorage.removeItem('nih_registration_draft');
+    } catch (e) {}
+    setFullName('');
+    setFatherOrHusbandName('');
+    setAge('');
+    setDob('');
+    setCnic('');
+    setMobile('');
+    setAddress('');
+    setBloodGroup('');
+    setAllergies('');
+    setMatchedExistingPatient(null);
+  };
 
   const filteredDoctors = initialDoctors.filter(
     (d) => !departmentId || d.departmentId === departmentId
   );
   const currentDoctor = initialDoctors.find((d) => d.id === doctorId) || filteredDoctors[0];
   const fee = currentDoctor?.fee || 2000;
-  const netFee = Math.max(0, fee - discountAmount);
+  const netFee = Math.max(0, fee - Number(discountAmount || 0));
+  const numericReceived = amountReceived === '' ? netFee : Number(amountReceived);
+  const balance = netFee - numericReceived;
 
-  // Fetch recent visits for right panel
+  // Fetch recent visits
   const fetchRecentVisits = async () => {
     try {
-      const res = await fetch("/api/queue");
+      const res = await fetch('/api/queue');
       if (res.ok) {
         const data = await res.json();
-        setRecentVisits((data.visits || []).slice(0, 5));
+        setRecentVisits((data.visits || []).slice(0, 6));
       }
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
   };
 
   useEffect(() => {
@@ -145,16 +280,37 @@ export default function ReceptionClient({
     }
   }, [cnic, mobile, selectedPatient]);
 
+  // Top "Search First" bar
+  useEffect(() => {
+    if (!topSearchQuery.trim() || topSearchQuery.length < 2) {
+      setTopSearchResults([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setIsTopSearching(true);
+      try {
+        const res = await fetch(`/api/patients?q=${encodeURIComponent(topSearchQuery)}&limit=4`);
+        const data = await res.json();
+        setTopSearchResults(data.patients || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsTopSearching(false);
+      }
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [topSearchQuery]);
+
   // Handle Patient Registration
-  const handleRegisterPatient = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRegisterPatient = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setErrorMessage(null);
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("/api/patients", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/patients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fullName: fullName.trim(),
           fatherOrHusbandName: fatherOrHusbandName.trim() || undefined,
@@ -163,7 +319,7 @@ export default function ReceptionClient({
           cnic: cnic.trim() || undefined,
           mobile: mobile.trim(),
           address: address.trim() || undefined,
-          city: city.trim() || "Lahore",
+          city: city.trim() || 'Lahore',
           bloodGroup: bloodGroup || undefined,
           emergencyContact: emergencyContact.trim() || undefined,
           allergies: allergies.trim() || undefined,
@@ -173,24 +329,90 @@ export default function ReceptionClient({
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to register patient.");
+        throw new Error(data.error || 'Failed to register patient.');
       }
 
       setRegisteredPatient(data.patient);
       setSelectedPatient(data.patient);
-      setActiveTab("visit");
+      clearDraft();
+      toast.success('Patient Registered', `${data.patient.name} (${data.patient.mrNumber})`);
+      setActiveTab('visit');
     } catch (err: any) {
       setErrorMessage(err.message);
+      toast.error('Registration Failed', err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle Full Registration + Direct Token Generation
+  const handleRegisterAndToken = async () => {
+    setErrorMessage(null);
+    setIsSubmitting(true);
+
+    try {
+      let patient = selectedPatient;
+      if (!patient) {
+        const pRes = await fetch('/api/patients', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName: fullName.trim(),
+            fatherOrHusbandName: fatherOrHusbandName.trim() || undefined,
+            age: age ? Number(age) : undefined,
+            gender,
+            cnic: cnic.trim() || undefined,
+            mobile: mobile.trim(),
+            address: address.trim() || undefined,
+            city: city.trim() || 'Lahore',
+            bloodGroup: bloodGroup || undefined,
+            allergies: allergies.trim() || undefined,
+          }),
+        });
+        const pData = await pRes.json();
+        if (!pRes.ok) throw new Error(pData.error || 'Failed to register patient.');
+        patient = pData.patient;
+        setRegisteredPatient(patient);
+        setSelectedPatient(patient);
+      }
+
+      // Now create visit token
+      const vRes = await fetch('/api/visits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patientId: patient.id,
+          doctorId: currentDoctor.id,
+          departmentId: currentDoctor.departmentId,
+          visitType,
+          priority,
+          consultationFee: fee,
+          discountAmount: Number(discountAmount) || 0,
+          discountReason: discountReason || undefined,
+          paymentMethod,
+        }),
+      });
+      const vData = await vRes.json();
+      if (!vRes.ok) throw new Error(vData.error || 'Failed to issue token.');
+
+      setIssuedVisit(vData.visit);
+      setShowSuccessModal(true);
+      fetchRecentVisits();
+      clearDraft();
+      toast.success('Token Generated', `Token #${vData.visit.tokenNumber} assigned to Dr. ${currentDoctor.name}`);
+    } catch (err: any) {
+      setErrorMessage(err.message);
+      toast.error('Operation Error', err.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   // Handle OPD Visit / Token creation
-  const handleCreateVisit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreateVisit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!selectedPatient) {
-      setErrorMessage("Please select or register a patient first.");
+      setErrorMessage('Please select or register a patient first.');
       return;
     }
 
@@ -198,9 +420,9 @@ export default function ReceptionClient({
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("/api/visits", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/visits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           patientId: selectedPatient.id,
           doctorId: currentDoctor.id,
@@ -216,15 +438,18 @@ export default function ReceptionClient({
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to issue token.");
+        throw new Error(data.error || 'Failed to issue token.');
       }
 
       setIssuedVisit(data.visit);
+      setShowSuccessModal(true);
       fetchRecentVisits();
       setDiscountAmount(0);
-      setDiscountReason("");
+      setDiscountReason('');
+      toast.success('Token Generated', `Token #${data.visit.tokenNumber} for Dr. ${currentDoctor.name}`);
     } catch (err: any) {
       setErrorMessage(err.message);
+      toast.error('Token Error', err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -248,179 +473,217 @@ export default function ReceptionClient({
 
   const handleSelectExisting = (patient: any) => {
     setSelectedPatient(patient);
+    setMatchedExistingPatient(patient);
     setDuplicateWarning([]);
-    setActiveTab("visit");
-  };
-
-  const startCamera = async () => {
-    try {
-      setCameraActive(true);
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (err) {
-      alert("Webcam not accessible or permission denied.");
-      setCameraActive(false);
-    }
-  };
-
-  const capturePhoto = () => {
-    if (videoRef.current) {
-      const canvas = document.createElement("canvas");
-      canvas.width = 320;
-      canvas.height = 240;
-      const ctx = canvas.getContext("2d");
-      ctx?.drawImage(videoRef.current, 0, 0, 320, 240);
-      setPhotoUrl(canvas.toDataURL("image/jpeg"));
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream?.getTracks().forEach((track) => track.stop());
-      setCameraActive(false);
-    }
+    setTopSearchQuery('');
+    setTopSearchResults([]);
+    setActiveTab('visit');
+    toast.info('Patient Selected', `${patient.name} (${patient.mrNumber})`);
   };
 
   return (
     <div className="space-y-6">
-      {/* 80mm Thermal Receipt Modal */}
-      {issuedVisit && (
-        <PrintThermalReceipt
-          visit={issuedVisit}
-          hospitalProfile={hospitalProfile}
-          onClose={() => setIssuedVisit(null)}
-        />
-      )}
-
-      {/* Top Header & Switcher */}
-      <div className="hospital-card p-5 bg-white dark:bg-[#162638] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold font-heading text-[#0B4F8A] dark:text-white">
-            Reception Desk &amp; Patient Intake
-          </h1>
-          <p className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-0.5">
-            Rapid patient intake, CNIC duplicate check, and instant 80mm thermal token receipt.
-          </p>
-        </div>
-
-        {/* Tab Buttons */}
-        <div className="flex items-center gap-2 p-1 rounded-lg bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D]">
+      {/* Tab Switcher & Quick Buttons */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#E3E9EF] pb-3">
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setActiveTab("register")}
-            className={`px-3.5 py-2 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-              activeTab === "register"
-                ? "bg-[#0B4F8A] text-white shadow-sm"
-                : "text-[#5B6B7B] dark:text-[#94A7BA] hover:text-[#0B4F8A] dark:hover:text-white"
+            type="button"
+            onClick={() => {
+              setActiveTab('register');
+              setSelectedPatient(null);
+              clearDraft();
+            }}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'register'
+                ? 'bg-[#0B4F8A] text-white shadow-xs'
+                : 'bg-white border border-[#D5DDE5] text-[#1B2733] hover:bg-[#F8FAFC]'
             }`}
           >
-            <UserPlus className="w-3.5 h-3.5" />
+            <UserPlus className="h-4 w-4" />
             <span>New Patient (F2)</span>
           </button>
 
           <button
-            onClick={() => setActiveTab("visit")}
-            className={`px-3.5 py-2 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-              activeTab === "visit"
-                ? "bg-[#0B4F8A] text-white shadow-sm"
-                : "text-[#5B6B7B] dark:text-[#94A7BA] hover:text-[#0B4F8A] dark:hover:text-white"
+            type="button"
+            onClick={() => setActiveTab('visit')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'visit'
+                ? 'bg-[#1E9E8F] text-white shadow-xs'
+                : 'bg-white border border-[#D5DDE5] text-[#1B2733] hover:bg-[#F8FAFC]'
             }`}
           >
-            <CalendarPlus className="w-3.5 h-3.5" />
+            <CalendarPlus className="h-4 w-4" />
             <span>Issue Token (F4)</span>
           </button>
 
           <button
-            onClick={() => setActiveTab("search")}
-            className={`px-3.5 py-2 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-              activeTab === "search"
-                ? "bg-[#0B4F8A] text-white shadow-sm"
-                : "text-[#5B6B7B] dark:text-[#94A7BA] hover:text-[#0B4F8A] dark:hover:text-white"
+            type="button"
+            onClick={() => setActiveTab('search')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'search'
+                ? 'bg-[#0B4F8A] text-white shadow-xs'
+                : 'bg-white border border-[#D5DDE5] text-[#1B2733] hover:bg-[#F8FAFC]'
             }`}
           >
-            <Search className="w-3.5 h-3.5" />
-            <span>Find Record (F3)</span>
+            <Search className="h-4 w-4" />
+            <span>Search Master Directory</span>
           </button>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs text-[#5B6B7B]">
+          <span className="font-medium">Active Doctor:</span>
+          <span className="font-bold text-[#0B4F8A]">Dr. {currentDoctor?.name}</span>
+          <span className="text-[#8A97A5]">({currentDoctor?.room || 'Room 101'})</span>
         </div>
       </div>
 
       {/* Error Banner */}
       {errorMessage && (
-        <div className="p-3.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-[#D64545] text-xs flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span className="font-medium">{errorMessage}</span>
-          </div>
-          <button onClick={() => setErrorMessage(null)}>
-            <X className="w-4 h-4" />
+        <div className="flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs font-medium text-rose-800">
+          <AlertCircle className="h-4 w-4 flex-shrink-0 text-rose-600" />
+          <span>{errorMessage}</span>
+          <button
+            type="button"
+            onClick={() => setErrorMessage(null)}
+            className="ml-auto text-rose-600 hover:text-rose-900"
+          >
+            <X className="h-4 w-4" />
           </button>
         </div>
       )}
 
-      {/* Two-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column (8 cols): Main Form */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* Selected Patient Banner (for Visit Tab) */}
-          {selectedPatient && activeTab === "visit" && (
-            <div className="p-4 rounded-xl bg-[#E6F5F3] dark:bg-teal-950/40 border border-[#1E9E8F]/30 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#1E9E8F] text-white font-bold flex items-center justify-center text-sm">
-                  {selectedPatient.fullName.charAt(0)}
+      {/* ===================================================================== */}
+      {/* TAB 1: HERO PATIENT REGISTRATION (Two-Column Layout)                  */}
+      {/* ===================================================================== */}
+      {activeTab === 'register' && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left Column (8 cols): Form Sections */}
+          <div className="lg:col-span-8 space-y-6">
+            <Card>
+              {/* Section 1: Search First Bar */}
+              <div className="border-b border-[#F0F4F8] pb-5 mb-5">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-heading text-sm font-bold uppercase tracking-wider text-[#0B4F8A]">
+                    1. Search Master Records First
+                  </h3>
+                  <span className="text-xs text-[#8A97A5]">Prevents duplicate hospital files</span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#1B2733] dark:text-white text-sm">
-                      {selectedPatient.fullName}
-                    </span>
-                    <span className="font-mono text-[#0B4F8A] dark:text-[#64B5F6] font-bold bg-white dark:bg-[#162638] px-2 py-0.5 rounded text-[11px] border border-[#E3E9EF] dark:border-[#23374D]">
-                      {selectedPatient.mrNumber}
-                    </span>
+
+                <div className="relative">
+                  <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A97A5]" />
+                  <input
+                    type="text"
+                    value={topSearchQuery}
+                    onChange={(e) => setTopSearchQuery(e.target.value)}
+                    placeholder="Search by MR No, CNIC, mobile or name..."
+                    className="h-11 w-full rounded-lg border border-[#D5DDE5] bg-[#FBFDFF] pl-10 pr-10 text-sm text-[#1B2733] placeholder-[#8A97A5] focus:border-[#1E9E8F] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1E9E8F]/20"
+                  />
+                  {topSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTopSearchQuery('');
+                        setTopSearchResults([]);
+                      }}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8A97A5] hover:text-[#1B2733]"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Top Search Results Dropdown / Cards */}
+                {topSearchResults.length > 0 && (
+                  <div className="mt-2.5 space-y-2 rounded-xl border border-[#B5CDE0] bg-[#E8F1F9]/40 p-3">
+                    <p className="text-xs font-semibold text-[#0B4F8A]">Matching Patients Found:</p>
+                    <div className="space-y-1.5">
+                      {topSearchResults.map((pat) => (
+                        <div
+                          key={pat.id}
+                          className="flex items-center justify-between rounded-lg border border-[#D5DDE5] bg-white p-2.5 text-xs hover:border-[#0B4F8A]"
+                        >
+                          <div>
+                            <span className="font-bold text-[#1B2733]">{pat.name}</span>
+                            <span className="ml-2 font-mono font-bold text-[#0B4F8A]">({pat.mrNumber})</span>
+                            <span className="ml-2 text-[#5B6B7B]">{pat.mobile}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleSelectExisting(pat)}
+                              className="rounded bg-[#1E9E8F] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#167C70]"
+                            >
+                              New Visit
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <span className="text-[#5B6B7B] dark:text-[#94A7BA] text-[11px]">
-                    {selectedPatient.gender} &bull; {selectedPatient.age || "—"} Yrs &bull; Mobile: {selectedPatient.mobile} &bull; CNIC: {formatCNIC(selectedPatient.cnic)}
-                  </span>
-                </div>
+                )}
+
+                {/* Matched Patient Banner if selected */}
+                {matchedExistingPatient && (
+                  <div className="mt-3 flex items-center justify-between rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs text-teal-900">
+                    <div className="flex items-center gap-2.5">
+                      <UserCheck className="h-5 w-5 text-[#167C70]" />
+                      <div>
+                        <p className="font-bold">Patient already registered: {matchedExistingPatient.name}</p>
+                        <p className="text-[11px] text-teal-700">
+                          MR: {matchedExistingPatient.mrNumber} • Phone: {matchedExistingPatient.mobile}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMatchedExistingPatient(null);
+                          setSelectedPatient(null);
+                        }}
+                        className="rounded border border-teal-300 bg-white px-2.5 py-1 text-xs font-medium text-teal-800"
+                      >
+                        Clear
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('visit')}
+                        className="rounded bg-[#1E9E8F] px-3 py-1 text-xs font-bold text-white shadow-xs"
+                      >
+                        Proceed to Visit &rarr;
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <button
-                onClick={() => setSelectedPatient(null)}
-                className="text-xs font-semibold text-[#0B4F8A] hover:underline cursor-pointer"
-              >
-                Change Patient
-              </button>
-            </div>
-          )}
-
-          {/* TAB 1: NEW PATIENT REGISTRATION FORM */}
-          {activeTab === "register" && (
-            <div className="hospital-card p-6 bg-white dark:bg-[#162638]">
-              {/* Duplicate warning popup */}
+              {/* Duplicate Detection Warning Banner */}
               {duplicateWarning.length > 0 && (
-                <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-300 dark:border-amber-700 text-xs">
-                  <div className="flex items-center gap-2 font-bold text-amber-900 dark:text-amber-300 mb-1.5">
-                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900 bg-amber-500/10">
+                  <div className="flex items-center gap-2 font-bold text-amber-800">
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
                     <span>Existing Patient Found</span>
                   </div>
-                  <p className="text-amber-800 dark:text-amber-400 mb-3 text-xs leading-relaxed">
-                    A patient matching this CNIC or Mobile already exists in the hospital directory. Click below to open their existing record instead of creating a duplicate:
+                  <p className="mt-1 text-[#5B6B7B]">
+                    A patient with this mobile or CNIC is already registered in the hospital database:
                   </p>
-                  <div className="space-y-2">
+                  <div className="mt-2 space-y-1">
                     {duplicateWarning.map((match) => (
                       <div
                         key={match.id}
-                        className="flex items-center justify-between p-3 rounded-lg bg-white dark:bg-[#111B27] border border-amber-200 dark:border-amber-800"
+                        className="flex items-center justify-between rounded-lg border border-amber-200 bg-white p-2"
                       >
                         <div>
-                          <span className="font-bold text-[#1B2733] dark:text-white">{match.fullName}</span>
-                          <span className="font-mono text-[#0B4F8A] dark:text-[#64B5F6] ml-2">({match.mrNumber})</span>
-                          <span className="text-[11px] text-[#5B6B7B] dark:text-[#94A7BA] block mt-0.5">
-                            Mobile: {match.mobile} &bull; CNIC: {formatCNIC(match.cnic)} &bull; City: {match.city}
-                          </span>
+                          <span className="font-bold text-[#1B2733]">{match.name}</span>
+                          <span className="ml-2 font-mono text-[#0B4F8A]">({match.mrNumber})</span>
+                          <span className="ml-2 text-[#5B6B7B]">{match.mobile}</span>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleSelectExisting(match)}
-                          className="btn-teal text-xs py-1.5 px-3"
+                          className="rounded bg-[#0B4F8A] px-2.5 py-1 font-semibold text-white hover:bg-[#093F6E]"
                         >
-                          Open &amp; Issue Token
+                          Use Existing
                         </button>
                       </div>
                     ))}
@@ -428,577 +691,744 @@ export default function ReceptionClient({
                 </div>
               )}
 
-              <form onSubmit={handleRegisterPatient} className="space-y-6 text-xs">
-                {/* Section 1: Personal Information */}
-                <div>
-                  <div className="font-bold text-xs uppercase tracking-wider text-[#0B4F8A] dark:text-[#64B5F6] mb-3 pb-2 border-b border-[#E3E9EF] dark:border-[#23374D]">
-                    1. Personal Information
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
+              {/* Form Content */}
+              <form onSubmit={handleRegisterPatient} className="space-y-6">
+                {/* Section 2: Personal Information */}
+                <FormSection
+                  title="2. Personal Information"
+                  description="Primary identity and patient demographic details"
+                >
+                  <FormGrid>
+                    <div className="sm:col-span-6 lg:col-span-6">
+                      <TextField
+                        label="Full Name (English or اردو)"
                         required
-                        placeholder="e.g. Muhammad Asif"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs"
+                        placeholder="e.g. Muhammad Asif"
+                        autoFocus
                       />
                     </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Father / Husband Name
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Tariq Mehmood"
+                    <div className="sm:col-span-6 lg:col-span-6">
+                      <TextField
+                        label="Father / Husband Name"
                         value={fatherOrHusbandName}
                         onChange={(e) => setFatherOrHusbandName(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs"
+                        placeholder="e.g. Abdul Rasheed"
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Gender *
-                      </label>
-                      <select
-                        value={gender}
-                        onChange={(e) => setGender(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs"
-                      >
-                        <option value="MALE">Male</option>
-                        <option value="FEMALE">Female</option>
-                        <option value="OTHER">Other</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Age (Years)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="125"
-                        placeholder="34"
-                        value={age}
-                        onChange={(e) => setAge(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs font-mono"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Mobile Number *
-                      </label>
-                      <input
-                        type="tel"
+                    <div className="sm:col-span-6 lg:col-span-6">
+                      <RadioCards
+                        label="Gender"
                         required
-                        placeholder="0300-1234567"
-                        value={mobile}
-                        onChange={(e) => setMobile(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs font-mono"
+                        value={gender}
+                        onChange={setGender}
+                        columns={3}
+                        options={[
+                          { value: 'MALE', label: 'Male' },
+                          { value: 'FEMALE', label: 'Female' },
+                          { value: 'OTHER', label: 'Other' },
+                        ]}
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        CNIC (13 Digits)
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="35201-1234567-1"
+                    <div className="sm:col-span-3 lg:col-span-3">
+                      <TextField
+                        label="Age (Years)"
+                        required
+                        type="number"
+                        value={age}
+                        onChange={(e) => handleAgeChange(e.target.value)}
+                        placeholder="34"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3 lg:col-span-3">
+                      <TextField
+                        label="Date of Birth"
+                        type="date"
+                        value={dob}
+                        onChange={(e) => handleDobChange(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="sm:col-span-6 lg:col-span-6">
+                      <CnicField
+                        label="National ID (CNIC)"
                         value={cnic}
-                        onChange={(e) => setCnic(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs font-mono"
+                        onChange={setCnic}
+                        placeholder="35201-1234567-1"
+                        helperText="13 digits with auto dashes"
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Blood Group
-                      </label>
-                      <select
-                        value={bloodGroup}
-                        onChange={(e) => setBloodGroup(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs"
-                      >
-                        <option value="">Unknown</option>
-                        <option value="A+">A+</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B-">B-</option>
-                        <option value="AB+">AB+</option>
-                        <option value="AB-">AB-</option>
-                        <option value="O+">O+</option>
-                        <option value="O-">O-</option>
-                      </select>
+                    <div className="sm:col-span-6 lg:col-span-6">
+                      <SelectField
+                        label="Marital Status"
+                        value={maritalStatus}
+                        onChange={(e) => setMaritalStatus(e.target.value)}
+                        options={[
+                          { value: 'SINGLE', label: 'Single' },
+                          { value: 'MARRIED', label: 'Married' },
+                          { value: 'WIDOWED', label: 'Widowed' },
+                          { value: 'DIVORCED', label: 'Divorced' },
+                        ]}
+                      />
                     </div>
-                  </div>
-                </div>
+                  </FormGrid>
+                </FormSection>
 
-                {/* Section 2: Contact & Address */}
-                <div>
-                  <div className="font-bold text-xs uppercase tracking-wider text-[#0B4F8A] dark:text-[#64B5F6] mb-3 pb-2 border-b border-[#E3E9EF] dark:border-[#23374D]">
-                    2. Address &amp; Emergency Contact
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Residential Address
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="House / Street / Area"
+                {/* Section 3: Contact Details */}
+                <FormSection
+                  title="3. Contact Information"
+                  description="Pakistani phone and residence address"
+                >
+                  <FormGrid>
+                    <div className="sm:col-span-6 lg:col-span-6">
+                      <PhoneField
+                        label="Primary Mobile Number"
+                        required
+                        value={mobile}
+                        onChange={setMobile}
+                        placeholder="0300-1234567"
+                        helperText="SMS token & prescriptions will be sent here"
+                      />
+                    </div>
+                    <div className="sm:col-span-6 lg:col-span-6">
+                      <PhoneField
+                        label="Alternate Phone (Optional)"
+                        value={altPhone}
+                        onChange={setAltPhone}
+                        placeholder="0321-7654321"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-8 lg:col-span-8">
+                      <TextField
+                        label="Residential Address"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs"
+                        placeholder="House / Street / Area"
                       />
                     </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        City
-                      </label>
-                      <input
-                        type="text"
+                    <div className="sm:col-span-4 lg:col-span-4">
+                      <TextField
+                        label="City"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs"
+                        placeholder="Lahore"
                       />
                     </div>
-                  </div>
+                  </FormGrid>
+                </FormSection>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Emergency Contact Phone
-                      </label>
-                      <input
-                        type="tel"
-                        placeholder="0300-9876543"
-                        value={emergencyContact}
-                        onChange={(e) => setEmergencyContact(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] font-mono h-11 text-xs"
+                {/* Section 4: Medical Details */}
+                <FormSection
+                  title="4. Medical Information"
+                  description="Emergency contacts, allergies, and blood group"
+                >
+                  <FormGrid>
+                    <div className="sm:col-span-4 lg:col-span-4">
+                      <SelectField
+                        label="Blood Group"
+                        value={bloodGroup}
+                        onChange={(e) => setBloodGroup(e.target.value)}
+                        options={[
+                          { value: '', label: 'Select Blood Group...' },
+                          { value: 'A+', label: 'A Positive (A+)' },
+                          { value: 'A-', label: 'A Negative (A-)' },
+                          { value: 'B+', label: 'B Positive (B+)' },
+                          { value: 'B-', label: 'B Negative (B-)' },
+                          { value: 'AB+', label: 'AB Positive (AB+)' },
+                          { value: 'AB-', label: 'AB Negative (AB-)' },
+                          { value: 'O+', label: 'O Positive (O+)' },
+                          { value: 'O-', label: 'O Negative (O-)' },
+                        ]}
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-[#D64545] mb-1.5 flex items-center gap-1">
-                        <ShieldAlert className="w-3.5 h-3.5" />
-                        <span>Known Drug Allergies (Alert in Doctor Banner)</span>
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Penicillin, Sulfa, Aspirin (or None)"
+                    <div className="sm:col-span-8 lg:col-span-8">
+                      <TextField
+                        label="Known Drug / Food Allergies"
                         value={allergies}
                         onChange={(e) => setAllergies(e.target.value)}
-                        className="w-full bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#D64545] h-11 text-xs"
+                        placeholder="e.g. Penicillin, Sulfa, Aspirin"
+                        helperText="Alerts doctor console with high priority warning"
                       />
                     </div>
-                  </div>
-                </div>
 
-                {/* Section 3: Webcam Capture */}
-                <div className="pt-2 flex items-center gap-4">
-                  <button
-                    type="button"
-                    onClick={cameraActive ? capturePhoto : startCamera}
-                    className="btn-secondary text-xs py-2 px-3.5"
-                  >
-                    <Camera className="w-3.5 h-3.5 text-[#0B4F8A]" />
-                    <span>{cameraActive ? "Capture Snapshot" : "Patient Photo (Webcam)"}</span>
-                  </button>
-
-                  {cameraActive && (
-                    <div className="relative w-36 h-24 rounded-lg overflow-hidden border border-[#0B4F8A]">
-                      <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
+                    <div className="sm:col-span-6 lg:col-span-6">
+                      <TextField
+                        label="Emergency Contact Name"
+                        value={emergencyContact}
+                        onChange={(e) => setEmergencyContact(e.target.value)}
+                        placeholder="e.g. Brother / Spouse Name"
+                      />
                     </div>
-                  )}
-
-                  {photoUrl && (
-                    <div className="flex items-center gap-2">
-                      <img src={photoUrl} alt="Patient" className="w-9 h-9 rounded-full border border-[#1E9E8F] object-cover" />
-                      <span className="text-[11px] text-[#1E9E8F] font-semibold">Photo Attached ✓</span>
+                    <div className="sm:col-span-6 lg:col-span-6">
+                      <PhoneField
+                        label="Emergency Contact Phone"
+                        value={emergencyPhone}
+                        onChange={setEmergencyPhone}
+                        placeholder="0300-9876543"
+                      />
                     </div>
-                  )}
-                </div>
+                  </FormGrid>
+                </FormSection>
 
-                {/* Submit Actions */}
-                <div className="pt-4 flex items-center justify-between border-t border-[#E3E9EF] dark:border-[#23374D]">
-                  <span className="text-[11px] text-[#5B6B7B] dark:text-[#94A7BA]">
-                    MR Number auto-assigned in format NIH-YYYY-XXXXXX
-                  </span>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="btn-primary text-xs py-2.5 px-5 font-bold"
-                  >
-                    <span>Register &amp; Proceed to Token</span>
-                    <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          {/* TAB 2: OPD VISIT / TOKEN CREATION FORM */}
-          {activeTab === "visit" && (
-            <div className="hospital-card p-6 bg-white dark:bg-[#162638]">
-              {!selectedPatient ? (
-                <div className="text-center py-12 space-y-3">
-                  <UserCheck className="w-10 h-10 text-[#8A97A5] mx-auto" />
-                  <h3 className="font-bold text-base text-[#1B2733] dark:text-white font-heading">
-                    No Patient Selected for Visit
-                  </h3>
-                  <p className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] max-w-sm mx-auto">
-                    Please register a new patient (F2) or select a returning patient from the directory (F3) to issue an OPD token.
-                  </p>
-                  <div className="pt-2 flex justify-center gap-3">
-                    <button
-                      onClick={() => setActiveTab("register")}
-                      className="btn-primary text-xs py-2 px-4"
-                    >
-                      Register New Patient (F2)
-                    </button>
-                    <button
-                      onClick={() => setActiveTab("search")}
-                      className="btn-secondary text-xs py-2 px-4"
-                    >
-                      Search Patient (F3)
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <form onSubmit={handleCreateVisit} className="space-y-6 text-xs">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {/* Department */}
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Clinical Department *
-                      </label>
-                      <select
+                {/* Section 5: Visit & Doctor Details */}
+                <FormSection
+                  title="5. OPD Visit Details"
+                  description="Consultant room assignment and visit category"
+                >
+                  <FormGrid>
+                    <div className="sm:col-span-6 lg:col-span-6">
+                      <SelectField
+                        label="Clinical Department"
+                        required
                         value={departmentId}
                         onChange={(e) => {
                           setDepartmentId(e.target.value);
-                          const matching = initialDoctors.filter((d) => d.departmentId === e.target.value);
-                          if (matching.length > 0) setDoctorId(matching[0].id);
+                          const docs = initialDoctors.filter((d) => d.departmentId === e.target.value);
+                          if (docs.length > 0) setDoctorId(docs[0].id);
                         }}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs"
-                      >
-                        {initialDepartments.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            {d.name} {d.nameUrdu ? `(${d.nameUrdu})` : ""}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Doctor */}
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Consultant *
-                      </label>
-                      <select
-                        value={doctorId || currentDoctor?.id}
-                        onChange={(e) => setDoctorId(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs"
-                      >
-                        {filteredDoctors.map((doc) => (
-                          <option key={doc.id} value={doc.id}>
-                            {doc.name} - Room {doc.roomNo} ({formatPKR(doc.fee)})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Visit Type */}
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Visit Type
-                      </label>
-                      <select
-                        value={visitType}
-                        onChange={(e) => setVisitType(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2.5 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs"
-                      >
-                        <option value="OPD">Regular OPD Consultation</option>
-                        <option value="FOLLOWUP">Follow-up Visit</option>
-                        <option value="EMERGENCY">Emergency Triage</option>
-                        <option value="ADMISSION">Admission Referral</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Priority & Financials */}
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D]">
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Triage Priority
-                      </label>
-                      <select
-                        value={priority}
-                        onChange={(e) => setPriority(e.target.value)}
-                        className={`w-full border rounded-lg px-3 py-2 outline-none font-semibold h-11 text-xs ${
-                          priority === "EMERGENCY"
-                            ? "bg-red-500 text-white border-red-600"
-                            : "bg-white dark:bg-[#162638] border-[#E3E9EF] dark:border-[#23374D] text-[#1B2733] dark:text-[#E6EEF5]"
-                        }`}
-                      >
-                        <option value="NORMAL">Normal Priority</option>
-                        <option value="EMERGENCY">🚨 Emergency Fast-Track</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Consultation Fee
-                      </label>
-                      <input
-                        type="text"
-                        disabled
-                        value={formatPKR(fee)}
-                        className="w-full bg-[#E3E9EF] dark:bg-[#1E3147] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2 font-mono font-bold text-[#1B2733] dark:text-white h-11 text-xs"
+                        options={initialDepartments.map((d) => ({
+                          value: d.id,
+                          label: d.name,
+                        }))}
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Discount Amount (PKR)
-                      </label>
-                      <input
+                    <div className="sm:col-span-6 lg:col-span-6">
+                      <SelectField
+                        label="Consultant Doctor"
+                        required
+                        value={doctorId}
+                        onChange={(e) => setDoctorId(e.target.value)}
+                        options={filteredDoctors.map((doc) => ({
+                          value: doc.id,
+                          label: `Dr. ${doc.name} (${doc.room || 'Room 101'}) — ${formatPKR(doc.fee)}`,
+                        }))}
+                      />
+                    </div>
+
+                    <div className="sm:col-span-12 lg:col-span-12">
+                      <RadioCards
+                        label="Patient Category"
+                        value={patientType}
+                        onChange={setPatientType}
+                        columns={3}
+                        options={[
+                          { value: 'NEW', label: 'New Patient', sublabel: 'Standard first consultation' },
+                          { value: 'FOLLOW_UP', label: 'Follow-up', sublabel: 'Within 7 days of initial visit' },
+                          { value: 'EMERGENCY', label: 'Emergency', sublabel: 'Immediate triage protocol' },
+                        ]}
+                      />
+                    </div>
+                  </FormGrid>
+                </FormSection>
+
+                {/* Section 6: Payment & Billing */}
+                <FormSection
+                  title="6. Payment & Fee Calculation"
+                  description="Outpatient consultation fee and discount authorization"
+                >
+                  <FormGrid>
+                    <div className="sm:col-span-4 lg:col-span-4">
+                      <TextField
+                        label="Consultation Fee (PKR)"
+                        value={formatPKR(fee)}
+                        disabled
+                        className="bg-[#F8FAFC] font-bold text-[#0B4F8A]"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-4 lg:col-span-4">
+                      <TextField
+                        label="Discount Amount (PKR)"
                         type="number"
-                        min="0"
-                        max={fee}
-                        value={discountAmount}
+                        value={discountAmount || ''}
                         onChange={(e) => setDiscountAmount(Number(e.target.value) || 0)}
                         placeholder="0"
-                        className="w-full bg-white dark:bg-[#162638] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2 text-[#1B2733] dark:text-[#E6EEF5] font-mono h-11 text-xs"
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Payment Method
-                      </label>
-                      <select
+                    <div className="sm:col-span-4 lg:col-span-4">
+                      <TextField
+                        label="Net Payable (PKR)"
+                        value={formatPKR(netFee)}
+                        disabled
+                        className="bg-[#E6F5F3] font-bold text-[#167C70]"
+                      />
+                    </div>
+
+                    {discountAmount > 0 && (
+                      <div className="sm:col-span-12 lg:col-span-12">
+                        <TextField
+                          label="Discount Reason / Authorized By"
+                          required
+                          value={discountReason}
+                          onChange={(e) => setDiscountReason(e.target.value)}
+                          placeholder="e.g. Hospital Staff Relative / Medical Director Approval"
+                          helperText="Required for hospital audit trail"
+                        />
+                      </div>
+                    )}
+
+                    <div className="sm:col-span-12 lg:col-span-12">
+                      <RadioCards
+                        label="Payment Method"
                         value={paymentMethod}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-full bg-white dark:bg-[#162638] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2 text-[#1B2733] dark:text-[#E6EEF5] font-bold h-11 text-xs"
-                      >
-                        <option value="CASH">Cash Payment</option>
-                        <option value="CARD">Debit / Credit Card</option>
-                        <option value="JAZZCASH">JazzCash</option>
-                        <option value="EASYPAISA">Easypaisa</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {discountAmount > 0 && (
-                    <div>
-                      <label className="block text-xs font-semibold text-[#1B2733] dark:text-[#E6EEF5] mb-1.5">
-                        Reason for Discount *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Hospital staff family / Welfare concession"
-                        value={discountReason}
-                        onChange={(e) => setDiscountReason(e.target.value)}
-                        className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2 text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11 text-xs"
+                        onChange={setPaymentMethod}
+                        columns={3}
+                        options={[
+                          { value: 'CASH', label: 'Cash', sublabel: 'Direct reception handover' },
+                          { value: 'CARD', label: 'Debit / Credit Card', sublabel: 'POS machine terminal' },
+                          { value: 'ONLINE', label: 'Online / Bank Transfer', sublabel: 'Easypaisa / JazzCash / Raast' },
+                        ]}
                       />
+                    </div>
+                  </FormGrid>
+                </FormSection>
+
+                {/* Sticky Actions Bar */}
+                <FormActions
+                  onCancel={clearDraft}
+                  cancelLabel="Clear Form"
+                  onSaveDraft={() => toast.info('Draft Saved', 'Patient details preserved in browser session.')}
+                  draftLabel="Save Draft"
+                  onSaveAndPrint={handleRegisterPatient}
+                  saveAndPrintLabel="Register & Proceed to Token"
+                  onSave={handleRegisterPatient}
+                  saveLabel="Register Patient Only"
+                  isSaving={isSubmitting}
+                />
+              </form>
+            </Card>
+          </div>
+
+          {/* Right Column (4 cols sticky): Live Summary Card & Recent Registrations */}
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-20">
+            {/* Live Fee & Patient Summary Card */}
+            <div className="rounded-xl border border-[#B5CDE0] bg-[#E8F1F9]/50 p-5 shadow-sm">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#0B4F8A] font-mono">
+                Live Visit Summary
+              </span>
+
+              <div className="mt-3 flex items-center gap-3 border-b border-[#D5E6F5] pb-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0B4F8A] text-white font-bold text-base">
+                  {fullName ? fullName.charAt(0).toUpperCase() : '?'}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-heading text-sm font-bold text-[#1B2733] truncate">
+                    {fullName || 'New Patient'}
+                  </h4>
+                  <p className="text-xs text-[#5B6B7B]">
+                    {gender} • {age ? `${age} yrs` : 'Age pending'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-2.5 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[#5B6B7B]">Consultant:</span>
+                  <span className="font-semibold text-[#1B2733]">Dr. {currentDoctor?.name}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#5B6B7B]">Room Number:</span>
+                  <span className="font-mono font-semibold text-[#1B2733]">
+                    {currentDoctor?.room || 'Room 101'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#5B6B7B]">Expected Token:</span>
+                  <span className="rounded-md bg-[#0B4F8A] px-2 py-0.5 font-mono font-bold text-white">
+                    Next in Queue
+                  </span>
+                </div>
+
+                <div className="border-t border-[#D5E6F5] pt-2.5 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#5B6B7B]">Doctor Fee:</span>
+                    <span className="text-[#1B2733]">{formatPKR(fee)}</span>
+                  </div>
+                  {discountAmount > 0 && (
+                    <div className="flex items-center justify-between text-rose-600">
+                      <span>Discount:</span>
+                      <span>-{formatPKR(discountAmount)}</span>
                     </div>
                   )}
-
-                  {/* Total & Submit */}
-                  <div className="pt-4 border-t border-[#E3E9EF] dark:border-[#23374D] flex items-center justify-between">
-                    <div>
-                      <span className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] block">Net Payable Amount</span>
-                      <span className="text-2xl font-bold font-heading text-[#0B4F8A] dark:text-[#64B5F6]">
-                        {formatPKR(netFee)}
-                      </span>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="btn-primary text-xs py-2.5 px-5 font-bold"
-                    >
-                      <Printer className="w-4 h-4" />
-                      <span>Issue Token &amp; Print Slip</span>
-                    </button>
+                  <div className="flex items-center justify-between text-sm font-bold text-[#0B4F8A] pt-1 border-t border-[#D5E6F5]">
+                    <span>Total Payable:</span>
+                    <span>{formatPKR(netFee)}</span>
                   </div>
-                </form>
-              )}
-            </div>
-          )}
+                </div>
+              </div>
 
-          {/* TAB 3: SEARCH PATIENT DIRECTORY */}
-          {activeTab === "search" && (
-            <div className="hospital-card p-6 bg-white dark:bg-[#162638] space-y-4">
-              <form onSubmit={handleSearch} className="flex gap-2.5">
-                <input
-                  type="text"
-                  placeholder="Search by MR Number, Patient Name, Mobile or CNIC..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-4 py-2 text-xs text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11"
-                />
+              <div className="mt-5">
                 <button
-                  type="submit"
-                  disabled={isSearching}
-                  className="btn-primary text-xs px-6 font-bold h-11"
+                  type="button"
+                  onClick={handleRegisterPatient}
+                  disabled={isSubmitting || !fullName || !mobile}
+                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#0B4F8A] px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-[#093F6E] transition-colors disabled:opacity-50"
                 >
-                  Search
+                  <ArrowRight className="h-4 w-4" />
+                  <span>Register & Proceed to Token</span>
                 </button>
-              </form>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs hospital-table text-left">
-                  <thead>
-                    <tr>
-                      <th>MR Number</th>
-                      <th>Patient Name</th>
-                      <th>Age / Gender</th>
-                      <th>Mobile</th>
-                      <th>CNIC</th>
-                      <th className="text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {searchResults.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="py-8 text-center text-[#8A97A5]">
-                          Enter a search term above to locate patient records.
-                        </td>
-                      </tr>
-                    ) : (
-                      searchResults.map((p) => (
-                        <tr key={p.id}>
-                          <td className="font-mono font-bold text-[#0B4F8A] dark:text-[#64B5F6]">
-                            {p.mrNumber}
-                          </td>
-                          <td className="font-semibold text-[#1B2733] dark:text-white">
-                            {p.fullName}
-                          </td>
-                          <td className="text-[#5B6B7B] dark:text-[#94A7BA]">
-                            {p.age || "—"} Yrs / {p.gender}
-                          </td>
-                          <td className="font-mono">{p.mobile}</td>
-                          <td className="font-mono">{formatCNIC(p.cnic)}</td>
-                          <td className="text-right">
-                            <button
-                              onClick={() => handleSelectExisting(p)}
-                              className="btn-secondary text-[11px] py-1 px-3"
-                            >
-                              New Visit &rarr;
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Right Column (4 cols): Sticky Panel */}
-        <div className="lg:col-span-4 space-y-6 sticky top-24">
-          {/* Panel Card 1: Today's Recent Tokens */}
-          <div className="hospital-card p-5 bg-white dark:bg-[#162638]">
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E3E9EF] dark:border-[#23374D]">
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#0B4F8A] dark:text-[#64B5F6]" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B2733] dark:text-[#E6EEF5] font-heading">
-                  Today&apos;s Recent Tokens
-                </h3>
-              </div>
-              <span className="text-[10px] text-[#1E9E8F] font-semibold">Live</span>
-            </div>
-
-            <div className="space-y-2.5 text-xs">
-              {recentVisits.length > 0 ? (
-                recentVisits.map((v) => (
-                  <div
-                    key={v.id}
-                    className="p-2.5 rounded-lg bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-7 h-7 rounded bg-[#E8F1F9] dark:bg-[#1E3147] text-[#0B4F8A] dark:text-[#64B5F6] font-mono font-bold flex items-center justify-center text-xs">
-                        #{v.tokenNumber}
-                      </span>
-                      <div>
-                        <span className="font-semibold text-[#1B2733] dark:text-white block truncate max-w-[120px]">
-                          {v.patient.fullName}
-                        </span>
-                        <span className="text-[10px] text-[#5B6B7B] dark:text-[#94A7BA] block">
-                          Dr. {v.doctor.name} ({v.doctor.roomNo})
-                        </span>
-                      </div>
-                    </div>
-
-                    <span
-                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                        v.status === "WAITING"
-                          ? "bg-amber-50 text-[#E39B12] border border-amber-200"
-                          : v.status === "IN_CONSULTATION"
-                          ? "bg-blue-50 text-[#2F80C9] border border-blue-200"
-                          : "bg-[#E6F5F3] text-[#1E9E8F] border border-[#1E9E8F]/20"
-                      }`}
-                    >
-                      {v.status.replace("_", " ")}
-                    </span>
-                  </div>
-                ))
+            {/* Today's Recent Registrations Mini List */}
+            <Card dense>
+              <CardHeader
+                title="Today's Recent Tokens"
+                subtitle="Real-time check-in stream"
+                actionText="Live Queue"
+                actionHref="/dashboard/queue"
+              />
+              {recentVisits.length === 0 ? (
+                <p className="text-center py-4 text-xs text-[#8A97A5]">No visits issued yet today.</p>
               ) : (
-                <div className="text-center py-6 text-xs text-[#8A97A5]">
-                  No tokens issued yet today.
+                <div className="divide-y divide-[#F0F4F8]">
+                  {recentVisits.slice(0, 5).map((v) => (
+                    <div key={v.id} className="py-2.5 flex items-center justify-between text-xs">
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="rounded bg-[#E8F1F9] px-1.5 py-0.2 font-mono font-bold text-[#0B4F8A]">
+                            #{v.tokenNumber}
+                          </span>
+                          <span className="font-semibold text-[#1B2733] truncate max-w-[130px]">
+                            {v.patient?.name}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[#8A97A5] mt-0.5">
+                          Dr. {v.doctor?.name} • {v.department?.name}
+                        </p>
+                      </div>
+                      <StatusChip status={v.status} size="sm" />
+                    </div>
+                  ))}
                 </div>
               )}
-            </div>
-          </div>
-
-          {/* Panel Card 2: Quick Search by MR Number */}
-          <div className="hospital-card p-5 bg-white dark:bg-[#162638]">
-            <div className="flex items-center gap-2 pb-3 mb-3 border-b border-[#E3E9EF] dark:border-[#23374D]">
-              <Search className="w-4 h-4 text-[#0B4F8A] dark:text-[#64B5F6]" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B2733] dark:text-[#E6EEF5] font-heading">
-                Quick Patient Lookup
-              </h3>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setActiveTab("search");
-                handleSearch(e);
-              }}
-              className="space-y-3 text-xs"
-            >
-              <input
-                type="text"
-                placeholder="Enter MR Number (e.g. NIH-...)"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg px-3.5 py-2 text-xs text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-10 font-mono"
-              />
-              <button type="submit" className="btn-secondary w-full justify-center text-xs py-2">
-                Search Patient (F3)
-              </button>
-            </form>
+            </Card>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* ===================================================================== */}
+      {/* TAB 2: ISSUE OPD TOKEN / NEW VISIT (for existing patients)             */}
+      {/* ===================================================================== */}
+      {activeTab === 'visit' && (
+        <Card className="max-w-4xl mx-auto">
+          <CardHeader
+            title="Issue Outpatient Consultation Token"
+            subtitle="Assign doctor and print official 80mm thermal receipt"
+          />
+
+          {/* Selected Patient Banner */}
+          {selectedPatient ? (
+            <div className="mb-6 rounded-xl border border-[#B5CDE0] bg-[#E8F1F9]/50 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Avatar name={selectedPatient.name} size="md" />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-heading text-sm font-bold text-[#1B2733]">{selectedPatient.name}</h4>
+                    <span className="rounded bg-[#0B4F8A] px-2 py-0.5 font-mono text-[11px] font-bold text-white">
+                      {selectedPatient.mrNumber}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#5B6B7B] mt-0.5">
+                    {selectedPatient.gender} • {selectedPatient.age || '—'} yrs • Phone: {selectedPatient.mobile}
+                  </p>
+                  {selectedPatient.allergies && (
+                    <span className="inline-block mt-1 text-[11px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.2 rounded border border-rose-200">
+                      Allergies: {selectedPatient.allergies}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedPatient(null)}
+                className="rounded-lg border border-[#D5DDE5] bg-white px-3 py-1.5 text-xs font-semibold text-[#5B6B7B] hover:text-[#1B2733]"
+              >
+                Change Patient
+              </button>
+            </div>
+          ) : (
+            <div className="mb-6 rounded-xl border border-dashed border-[#D5DDE5] bg-[#FBFDFF] p-6 text-center">
+              <Users className="mx-auto h-8 w-8 text-[#0B4F8A] mb-2" />
+              <h4 className="font-heading text-sm font-bold text-[#1B2733]">No Patient Selected</h4>
+              <p className="text-xs text-[#5B6B7B] mt-1 mb-3">
+                Lookup an existing patient from master directory or register a new one.
+              </p>
+              <div className="flex justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('search')}
+                  className="rounded-lg bg-[#0B4F8A] px-4 py-2 text-xs font-semibold text-white hover:bg-[#093F6E]"
+                >
+                  Search Master Directory
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('register')}
+                  className="rounded-lg border border-[#D5DDE5] bg-white px-4 py-2 text-xs font-semibold text-[#1B2733] hover:bg-[#F8FAFC]"
+                >
+                  New Patient (F2)
+                </button>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleCreateVisit} className="space-y-6">
+            <FormGrid>
+              <div className="sm:col-span-6 lg:col-span-6">
+                <SelectField
+                  label="Clinical Department"
+                  required
+                  value={departmentId}
+                  onChange={(e) => {
+                    setDepartmentId(e.target.value);
+                    const docs = initialDoctors.filter((d) => d.departmentId === e.target.value);
+                    if (docs.length > 0) setDoctorId(docs[0].id);
+                  }}
+                  options={initialDepartments.map((d) => ({
+                    value: d.id,
+                    label: d.name,
+                  }))}
+                />
+              </div>
+
+              <div className="sm:col-span-6 lg:col-span-6">
+                <SelectField
+                  label="Doctor & Fee"
+                  required
+                  value={doctorId}
+                  onChange={(e) => setDoctorId(e.target.value)}
+                  options={filteredDoctors.map((doc) => ({
+                    value: doc.id,
+                    label: `Dr. ${doc.name} (${doc.room || 'Room 101'}) — ${formatPKR(doc.fee)}`,
+                  }))}
+                />
+              </div>
+
+              <div className="sm:col-span-4 lg:col-span-4">
+                <TextField
+                  label="Doctor Fee"
+                  value={formatPKR(fee)}
+                  disabled
+                  className="bg-[#F8FAFC] font-bold text-[#0B4F8A]"
+                />
+              </div>
+
+              <div className="sm:col-span-4 lg:col-span-4">
+                <TextField
+                  label="Discount (PKR)"
+                  type="number"
+                  value={discountAmount || ''}
+                  onChange={(e) => setDiscountAmount(Number(e.target.value) || 0)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="sm:col-span-4 lg:col-span-4">
+                <TextField
+                  label="Net Total (PKR)"
+                  value={formatPKR(netFee)}
+                  disabled
+                  className="bg-[#E6F5F3] font-bold text-[#167C70]"
+                />
+              </div>
+
+              {discountAmount > 0 && (
+                <div className="sm:col-span-12 lg:col-span-12">
+                  <TextField
+                    label="Discount Reason"
+                    required
+                    value={discountReason}
+                    onChange={(e) => setDiscountReason(e.target.value)}
+                    placeholder="e.g. Senior Citizen / Director Approval"
+                  />
+                </div>
+              )}
+
+              <div className="sm:col-span-12 lg:col-span-12">
+                <RadioCards
+                  label="Payment Method"
+                  value={paymentMethod}
+                  onChange={setPaymentMethod}
+                  columns={3}
+                  options={[
+                    { value: 'CASH', label: 'Cash' },
+                    { value: 'CARD', label: 'Card (POS)' },
+                    { value: 'ONLINE', label: 'Online / Raast' },
+                  ]}
+                />
+              </div>
+            </FormGrid>
+
+            <div className="border-t border-[#F0F4F8] pt-4 flex items-center justify-end gap-3">
+              <button
+                type="submit"
+                disabled={isSubmitting || !selectedPatient}
+                className="inline-flex items-center gap-2 rounded-lg bg-[#1E9E8F] px-6 py-3 text-xs font-bold text-white shadow-sm hover:bg-[#167C70] transition-colors disabled:opacity-50"
+              >
+                <Printer className="h-4 w-4" />
+                <span>Issue Token & Print 80mm Slip</span>
+              </button>
+            </div>
+          </form>
+        </Card>
+      )}
+
+      {/* ===================================================================== */}
+      {/* TAB 3: SEARCH MASTER DIRECTORY                                        */}
+      {/* ===================================================================== */}
+      {activeTab === 'search' && (
+        <Card className="max-w-4xl mx-auto">
+          <CardHeader
+            title="Search Master Patients Directory"
+            subtitle="Lookup registered records by MR Number, CNIC, Phone, or Name"
+          />
+
+          <form onSubmit={handleSearch} className="mb-6 flex gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A97A5]" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search patient by MR Number, CNIC, Mobile, or Name..."
+                className="h-11 w-full rounded-lg border border-[#D5DDE5] bg-white pl-10 pr-4 text-sm text-[#1B2733] placeholder-[#8A97A5] focus:border-[#0B4F8A] focus:outline-none focus:ring-2 focus:ring-[#0B4F8A]/20"
+                autoFocus
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isSearching}
+              className="rounded-lg bg-[#0B4F8A] px-5 py-2.5 text-xs font-semibold text-white shadow-xs hover:bg-[#093F6E]"
+            >
+              {isSearching ? 'Searching...' : 'Search'}
+            </button>
+          </form>
+
+          {searchResults.length > 0 ? (
+            <div className="divide-y divide-[#F0F4F8] border-t border-[#F0F4F8]">
+              {searchResults.map((pat) => (
+                <div key={pat.id} className="py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Avatar name={pat.name} size="sm" />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-[#1B2733]">{pat.name}</span>
+                        <span className="rounded bg-[#E8F1F9] px-2 py-0.5 font-mono text-[10px] font-bold text-[#0B4F8A]">
+                          {pat.mrNumber}
+                        </span>
+                      </div>
+                      <p className="text-xs text-[#5B6B7B] mt-0.5">
+                        {pat.gender} • {pat.age || '—'} yrs • Phone: {pat.mobile} • CNIC: {pat.cnic || '—'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSelectExisting(pat)}
+                    className="rounded-lg bg-[#1E9E8F] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#167C70]"
+                  >
+                    Select
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            searchQuery &&
+            !isSearching && (
+              <div className="py-8 text-center text-xs text-[#8A97A5]">
+                No patients found matching your search.
+              </div>
+            )
+          )}
+        </Card>
+      )}
+
+      {/* ===================================================================== */}
+      {/* SUCCESS MODAL: LARGE TOKEN & 80MM RECEIPT RENDER                      */}
+      {/* ===================================================================== */}
+      {showSuccessModal && issuedVisit && (
+        <Modal
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          title="OPD Token Issued Successfully"
+          maxWidth="lg"
+          footer={
+            <div className="flex items-center justify-between w-full">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  setActiveTab('register');
+                  clearDraft();
+                }}
+                className="rounded-lg border border-[#D5DDE5] bg-white px-4 py-2 text-xs font-semibold text-[#1B2733] hover:bg-[#F8FAFC]"
+                autoFocus
+              >
+                Register Another (F2)
+              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="rounded-lg bg-[#0B4F8A] px-4 py-2 text-xs font-semibold text-white hover:bg-[#093F6E]"
+                >
+                  <Printer className="inline-block h-3.5 w-3.5 mr-1" />
+                  Print Token Slip
+                </button>
+              </div>
+            </div>
+          }
+        >
+          <div className="space-y-4">
+            {/* Big Token Display */}
+            <div className="rounded-xl border-2 border-[#1E9E8F] bg-[#E6F5F3]/40 p-6 text-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#167C70] font-mono">
+                Official OPD Token Number
+              </span>
+              <h2 className="font-heading text-5xl font-black text-[#0B4F8A] my-2">
+                #{issuedVisit.tokenNumber}
+              </h2>
+              <p className="text-sm font-bold text-[#1B2733]">
+                Dr. {issuedVisit.doctor?.name || currentDoctor?.name}
+              </p>
+              <p className="text-xs text-[#5B6B7B]">
+                {issuedVisit.department?.name || 'General OPD'} • Room {issuedVisit.doctor?.room || 'Room 101'}
+              </p>
+            </div>
+
+            {/* Embedded Official 80mm Thermal Slip Preview */}
+            <div className="thermal-receipt">
+              <PrintThermalReceipt
+                visit={issuedVisit}
+                hospitalProfile={hospitalProfile}
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Standalone Thermal Receipt Modal if issuedVisit exists and modal closed */}
+      {issuedVisit && !showSuccessModal && (
+        <div className="thermal-receipt hidden">
+          <PrintThermalReceipt
+            visit={issuedVisit}
+            hospitalProfile={hospitalProfile}
+          />
+        </div>
+      )}
     </div>
   );
 }
