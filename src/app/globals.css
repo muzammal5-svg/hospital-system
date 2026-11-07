@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 200 20% 98%;
+    --foreground: 205 55% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 205 55% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 205 55% 10%;
+
+    /* Hospital Teal #0EA5A4 */
+    --primary: 179 84% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 204 25% 94%;
+    --secondary-foreground: 205 55% 15%;
+
+    --muted: 210 20% 95%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 179 84% 94%;
+    --accent-foreground: 179 84% 25%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 179 84% 35%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Kontrora Deep Black #050505 */
+    --background: 0 0% 2%;
+    --foreground: 36 24% 90%; /* #EDE8E0 Bone */
+
+    --card: 210 20% 6%; /* #0B0F14 */
+    --card-foreground: 36 24% 90%;
+
+    --popover: 210 20% 6%;
+    --popover-foreground: 36 24% 90%;
+
+    --primary: 179 84% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 9%; /* #171717 */
+    --secondary-foreground: 36 24% 90%;
+
+    --muted: 0 0% 10%;
+    --muted-foreground: 36 7% 55%; /* #9A958C */
+
+    --accent: 179 84% 15%;
+    --accent-foreground: 179 84% 75%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 100% / 0.08;
+    --input: 0 0% 100% / 0.12;
+    --ring: 179 84% 42%;
+  }
+}
+
+/* Base Body */
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Urdu Typography Tweaks */
+[dir="rtl"] {
+  letter-spacing: 0 !important;
+  line-height: 1.8 !important;
+}
+
+/* Kontrora Pill Buttons */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 0.65rem 1.75rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-pill:active {
+  transform: scale(0.98);
+}
+
+/* Soft Glow Effects */
+.glow-teal {
+  box-shadow: 0 0 25px rgba(14, 165, 164, 0.35);
+}
+
+.glow-bone {
+  box-shadow: 0 0 20px rgba(237, 232, 224, 0.15);
+}
+
+/* ==============================================================================
+   PRINT STYLES: 80mm Thermal Receipt & A4 Letterhead Prescription
+   ============================================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* 80mm Thermal Receipt Layout */
+  .thermal-receipt {
+    width: 80mm !important;
+    max-width: 80mm !important;
+    margin: 0 auto !important;
+    padding: 3mm !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+    color: #000000 !important;
+    background: #ffffff !important;
+  }
+
+  .thermal-receipt h1, .thermal-receipt h2 {
+    font-size: 14px !important;
+    margin-bottom: 2px !important;
+  }
+
+  /* A4 Prescription Layout */
+  .a4-prescription {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 auto !important;
+    padding: 15mm 20mm !important;
+    font-family: Arial, sans-serif !important;
+    color: #000000 !important;
+    background: #ffffff !important;
+    page-break-after: always;
+  }
+
+  @page {
+    margin: 0;
+  }
+}
