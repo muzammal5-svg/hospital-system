@@ -1,20 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Syne, DM_Sans, Noto_Nastaliq_Urdu } from "next/font/google";
+import { Poppins, Noto_Nastaliq_Urdu } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 
-const syne = Syne({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-syne",
+  variable: "--font-poppins",
   display: "swap",
-  weight: ["600", "700", "800"],
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 const notoUrdu = Noto_Nastaliq_Urdu({
@@ -65,7 +58,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${syne.variable} ${dmSans.variable} ${notoUrdu.variable} min-h-screen antialiased selection:bg-teal-500 selection:text-white`}>
+      <body className={`${poppins.variable} ${notoUrdu.variable} font-sans min-h-screen antialiased selection:bg-teal-500 selection:text-white`}>
         <Providers>{children}</Providers>
       </body>
     </html>

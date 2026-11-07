@@ -70,6 +70,7 @@
 
 /* Base Body */
 body {
+  font-family: var(--font-poppins), "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   font-feature-settings: "rlig" 1, "calt" 1;
@@ -89,7 +90,7 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  font-family: var(--font-dm-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-poppins), "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 700;
   font-size: 0.75rem;
   letter-spacing: 0.12em;
@@ -112,19 +113,19 @@ body {
 
 /* Fluid Hero Display Typography */
 .hero-headline {
-  font-family: var(--font-syne), "Syne", sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
   font-size: clamp(2.6rem, 6.8vw, 5.8rem);
-  line-height: 1.03;
-  letter-spacing: -0.038em;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   font-weight: 800;
 }
 
 /* Section Headings */
 .section-headline {
-  font-family: var(--font-syne), "Syne", sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
   font-size: clamp(2rem, 4vw, 3.2rem);
-  line-height: 1.1;
-  letter-spacing: -0.025em;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   font-weight: 800;
 }
 

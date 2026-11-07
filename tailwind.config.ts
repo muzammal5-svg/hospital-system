@@ -17,8 +17,9 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-dm-sans)", "DM Sans", "-apple-system", "sans-serif"],
-        display: ["var(--font-syne)", "Syne", "sans-serif"],
+        sans: ["var(--font-poppins)", "Poppins", "-apple-system", "sans-serif"],
+        display: ["var(--font-poppins)", "Poppins", "sans-serif"],
+        poppins: ["var(--font-poppins)", "Poppins", "sans-serif"],
         urdu: ["var(--font-noto-urdu)", "Noto Nastaliq Urdu", "serif"],
       },
       colors: {
