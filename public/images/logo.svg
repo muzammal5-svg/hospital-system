@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 54" fill="none">
+  <!-- Symbol -->
+  <rect x="2" y="3" width="48" height="48" rx="10" fill="#0B4F8A"/>
+  <path d="M26 13V41M12 27H40" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="26" cy="27" r="7.5" fill="#1E9E8F"/>
+  <path d="M23.5 27.5L25 29L28.5 25.5" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Typography -->
+  <text x="60" y="27" font-family="'Poppins', sans-serif" font-weight="700" font-size="18" fill="#0B4F8A" letter-spacing="-0.02em">NASEEM IJAZ</text>
+  <text x="60" y="44" font-family="'Inter', sans-serif" font-weight="600" font-size="10" fill="#1E9E8F" letter-spacing="0.14em">HOSPITAL &bull; LAHORE</text>
+</svg>

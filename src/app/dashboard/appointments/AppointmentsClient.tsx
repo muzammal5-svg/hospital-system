@@ -12,6 +12,7 @@ import {
   AlertCircle,
   Search,
   Filter,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -108,26 +109,29 @@ export default function AppointmentsClient({
       {/* New Appointment Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs">
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-white/10">
-              <h3 className="font-bold text-sm text-neutral-900 dark:text-white">
+          <div className="bg-white border border-[#E3E9EF] rounded-xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E3E9EF]">
+              <h3 className="font-bold text-sm text-[#1B2733]">
                 Schedule New Appointment
               </h3>
-              <button onClick={() => setShowModal(false)} className="text-neutral-400 hover:text-neutral-600">
-                ✕
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-1 rounded-lg text-[#8A97A5] hover:text-[#1B2733] hover:bg-[#F6F9FC]"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {error && (
-              <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 text-red-500 rounded-xl">
+              <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleCreateAppointment} className="space-y-4">
               <div>
-                <label className="block text-neutral-700 dark:text-neutral-300 font-semibold mb-1">
-                  Patient Full Name *
+                <label className="block text-xs font-semibold text-[#1B2733] mb-1">
+                  Patient Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -135,13 +139,13 @@ export default function AppointmentsClient({
                   placeholder="e.g. Asad Ullah"
                   value={patientName}
                   onChange={(e) => setPatientName(e.target.value)}
-                  className="w-full bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-neutral-900 dark:text-white outline-none focus:border-teal-500"
+                  className="w-full bg-white border border-[#E3E9EF] rounded-lg px-3.5 py-2.5 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A]"
                 />
               </div>
 
               <div>
-                <label className="block text-neutral-700 dark:text-neutral-300 font-semibold mb-1">
-                  Mobile Number *
+                <label className="block text-xs font-semibold text-[#1B2733] mb-1">
+                  Mobile Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="tel"
@@ -149,13 +153,13 @@ export default function AppointmentsClient({
                   placeholder="0300-1234567"
                   value={patientMobile}
                   onChange={(e) => setPatientMobile(e.target.value)}
-                  className="w-full bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-neutral-900 dark:text-white outline-none focus:border-teal-500 font-mono"
+                  className="w-full bg-white border border-[#E3E9EF] rounded-lg px-3.5 py-2.5 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A] font-mono"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-neutral-700 dark:text-neutral-300 font-semibold mb-1">
+                  <label className="block text-xs font-semibold text-[#1B2733] mb-1">
                     Doctor
                   </label>
                   <select
@@ -165,7 +169,7 @@ export default function AppointmentsClient({
                       const d = doctors.find((doc) => doc.id === e.target.value);
                       if (d) setDeptId(d.departmentId);
                     }}
-                    className="w-full bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl px-3 py-2 text-neutral-900 dark:text-white outline-none focus:border-teal-500"
+                    className="w-full bg-white border border-[#E3E9EF] rounded-lg px-3 py-2 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A]"
                   >
                     {doctors.map((d) => (
                       <option key={d.id} value={d.id}>
@@ -176,13 +180,13 @@ export default function AppointmentsClient({
                 </div>
 
                 <div>
-                  <label className="block text-neutral-700 dark:text-neutral-300 font-semibold mb-1">
+                  <label className="block text-xs font-semibold text-[#1B2733] mb-1">
                     Slot Time
                   </label>
                   <select
                     value={slot}
                     onChange={(e) => setSlot(e.target.value)}
-                    className="w-full bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl px-3 py-2 text-neutral-900 dark:text-white outline-none focus:border-teal-500"
+                    className="w-full bg-white border border-[#E3E9EF] rounded-lg px-3 py-2 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A]"
                   >
                     {slots.map((s) => (
                       <option key={s} value={s}>
@@ -194,30 +198,30 @@ export default function AppointmentsClient({
               </div>
 
               <div>
-                <label className="block text-neutral-700 dark:text-neutral-300 font-semibold mb-1">
+                <label className="block text-xs font-semibold text-[#1B2733] mb-1">
                   Notes (Optional)
                 </label>
                 <input
                   type="text"
-                  placeholder="Reason for visit or clinical notes"
+                  placeholder="Reason for consultation"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-neutral-900 dark:text-white outline-none focus:border-teal-500"
+                  className="w-full bg-white border border-[#E3E9EF] rounded-lg px-3.5 py-2.5 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A]"
                 />
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
+              <div className="pt-2 flex justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-xl bg-neutral-100 dark:bg-white/5 font-semibold"
+                  className="px-4 py-2 rounded-lg border border-[#E3E9EF] text-[#5B6B7B] font-semibold hover:bg-[#F6F9FC]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn-pill bg-teal-500 text-black text-xs font-bold"
+                  className="px-4 py-2 rounded-lg bg-[#0B4F8A] hover:bg-[#093F6E] text-white text-xs font-semibold transition-colors disabled:opacity-50"
                 >
                   {loading ? "Booking..." : "Confirm & Send SMS"}
                 </button>
@@ -228,19 +232,19 @@ export default function AppointmentsClient({
       )}
 
       {/* Header and Filter Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1 border-b border-[#E3E9EF]">
         <div>
-          <h1 className="font-display font-extrabold text-2xl tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="font-display font-bold text-2xl tracking-tight text-[#1B2733]">
             Appointment Roster & Scheduling
           </h1>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-            Doctor-wise calendar slots with double-booking prevention.
+          <p className="text-sm text-[#5B6B7B] mt-0.5">
+            Doctor consultation calendar slots with real-time double-booking prevention.
           </p>
         </div>
 
         <button
           onClick={() => setShowModal(true)}
-          className="btn-pill bg-teal-500 hover:bg-teal-600 text-black text-xs font-bold flex items-center gap-2"
+          className="px-4 py-2 rounded-lg bg-[#0B4F8A] hover:bg-[#093F6E] text-white text-xs font-semibold flex items-center gap-2 transition-colors shadow-sm"
         >
           <Plus className="w-4 h-4" />
           <span>New Appointment</span>
@@ -248,25 +252,25 @@ export default function AppointmentsClient({
       </div>
 
       {/* Filters Strip */}
-      <div className="p-4 rounded-2xl bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 shadow-card-soft flex flex-wrap items-center gap-4 text-xs">
+      <div className="p-4 rounded-xl bg-white border border-[#E3E9EF] shadow-sm flex flex-wrap items-center gap-4 text-xs">
         <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-teal-500" />
-          <span className="font-semibold text-neutral-700 dark:text-neutral-300">Date:</span>
+          <Calendar className="w-4 h-4 text-[#0B4F8A]" />
+          <span className="font-semibold text-[#1B2733]">Date:</span>
           <input
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl px-3 py-1.5 text-neutral-900 dark:text-white outline-none"
+            className="bg-[#F6F9FC] border border-[#E3E9EF] rounded-lg px-3 py-1.5 text-[#1B2733] outline-none focus:border-[#0B4F8A]"
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-teal-500" />
-          <span className="font-semibold text-neutral-700 dark:text-neutral-300">Doctor:</span>
+          <Filter className="w-4 h-4 text-[#0B4F8A]" />
+          <span className="font-semibold text-[#1B2733]">Doctor:</span>
           <select
             value={selectedDoctor}
             onChange={(e) => setSelectedDoctor(e.target.value)}
-            className="bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl px-3 py-1.5 text-neutral-900 dark:text-white outline-none"
+            className="bg-[#F6F9FC] border border-[#E3E9EF] rounded-lg px-3 py-1.5 text-[#1B2733] outline-none focus:border-[#0B4F8A]"
           >
             <option value="">All Doctors ({doctors.length})</option>
             {doctors.map((d) => (
@@ -277,65 +281,65 @@ export default function AppointmentsClient({
           </select>
         </div>
 
-        <div className="ml-auto text-xs text-neutral-400 font-mono">
+        <div className="ml-auto text-xs text-[#5B6B7B] font-mono">
           Showing {filteredAppointments.length} Bookings
         </div>
       </div>
 
       {/* Appointments List / Table */}
-      <div className="rounded-2xl bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 shadow-card-soft overflow-hidden">
+      <div className="rounded-xl bg-white border border-[#E3E9EF] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead>
-              <tr className="border-b border-neutral-200 dark:border-white/10 text-neutral-400 bg-neutral-50 dark:bg-white/5">
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">Reference #</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">Slot Time</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">Patient Name</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">Mobile</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">Doctor / Dept</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">Status</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px] text-right">Actions</th>
+              <tr className="border-b border-[#E3E9EF] text-[#5B6B7B] bg-[#F6F9FC]">
+                <th className="py-3 px-4 font-semibold uppercase text-[10px]">Reference #</th>
+                <th className="py-3 px-4 font-semibold uppercase text-[10px]">Slot Time</th>
+                <th className="py-3 px-4 font-semibold uppercase text-[10px]">Patient Name</th>
+                <th className="py-3 px-4 font-semibold uppercase text-[10px]">Mobile</th>
+                <th className="py-3 px-4 font-semibold uppercase text-[10px]">Doctor / Dept</th>
+                <th className="py-3 px-4 font-semibold uppercase text-[10px]">Status</th>
+                <th className="py-3 px-4 font-semibold uppercase text-[10px] text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 dark:divide-white/5">
+            <tbody className="divide-y divide-[#E3E9EF]">
               {filteredAppointments.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-neutral-400">
+                  <td colSpan={7} className="py-10 text-center text-[#8A97A5]">
                     No appointments scheduled for this date and doctor filter.
                   </td>
                 </tr>
               ) : (
                 filteredAppointments.map((apt) => (
-                  <tr key={apt.id} className="hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-bold text-teal-600 dark:text-teal-400">
+                  <tr key={apt.id} className="hover:bg-[#F6F9FC] transition-colors">
+                    <td className="py-3.5 px-4 font-mono font-bold text-[#0B4F8A]">
                       {apt.referenceNo}
                     </td>
-                    <td className="py-3.5 px-4 font-bold text-neutral-900 dark:text-white">
+                    <td className="py-3.5 px-4 font-bold text-[#1B2733]">
                       <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-teal-500" />
+                        <Clock className="w-3.5 h-3.5 text-[#0B4F8A]" />
                         <span>{apt.timeSlot}</span>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 font-semibold text-neutral-800 dark:text-neutral-100">
+                    <td className="py-3.5 px-4 font-semibold text-[#1B2733]">
                       {apt.patientName}
                     </td>
-                    <td className="py-3.5 px-4 font-mono">{apt.patientMobile}</td>
+                    <td className="py-3.5 px-4 font-mono text-[#5B6B7B]">{apt.patientMobile}</td>
                     <td className="py-3.5 px-4">
-                      <span className="font-semibold text-neutral-900 dark:text-white block">
+                      <span className="font-semibold text-[#1B2733] block">
                         {apt.doctor.name}
                       </span>
-                      <span className="text-[11px] text-neutral-400">
+                      <span className="text-[11px] text-[#5B6B7B]">
                         Room {apt.doctor.roomNo} ({apt.department.name})
                       </span>
                     </td>
                     <td className="py-3.5 px-4">
                       <span
-                        className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                        className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
                           apt.status === "CONFIRMED"
-                            ? "bg-teal-100 text-teal-800 dark:bg-teal-950/40 dark:text-teal-300"
+                            ? "bg-[#E6F5F3] text-[#1E9E8F] border border-[#1E9E8F]/20"
                             : apt.status === "ATTENDED"
-                            ? "bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300"
-                            : "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300"
+                            ? "bg-[#E8F1F9] text-[#0B4F8A] border border-[#0B4F8A]/20"
+                            : "bg-red-50 text-red-700 border border-red-200"
                         }`}
                       >
                         {apt.status}
@@ -349,14 +353,14 @@ export default function AppointmentsClient({
                               `/dashboard/reception?action=new-visit&name=${encodeURIComponent(apt.patientName)}&mobile=${encodeURIComponent(apt.patientMobile)}&doctorId=${apt.doctorId}`
                             );
                           }}
-                          className="px-2.5 py-1 rounded bg-teal-500 hover:bg-teal-600 text-black font-bold text-[11px]"
+                          className="px-2.5 py-1 rounded-md bg-[#1E9E8F] hover:bg-[#167C70] text-white font-semibold text-[11px] transition-colors"
                           title="Issue OPD Token for this appointment"
                         >
                           Issue Token &rarr;
                         </button>
                         <button
                           onClick={() => handleUpdateStatus(apt.id, "CANCELLED")}
-                          className="p-1 rounded text-neutral-400 hover:text-red-500"
+                          className="p-1 rounded text-[#8A97A5] hover:text-red-600"
                           title="Cancel Booking"
                         >
                           <XCircle className="w-4 h-4" />

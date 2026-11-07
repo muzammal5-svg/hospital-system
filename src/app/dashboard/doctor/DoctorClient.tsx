@@ -16,6 +16,11 @@ import {
   Calendar,
   Clock,
   User,
+  HeartPulse,
+  FileText,
+  Pill,
+  History,
+  AlertTriangle,
 } from "lucide-react";
 
 interface DoctorClientProps {
@@ -34,6 +39,7 @@ export default function DoctorClient({
   );
   const [visits, setVisits] = useState(initialVisits);
   const [activeVisit, setActiveVisit] = useState<any | null>(null);
+  const [activeTab, setActiveTab] = useState<"vitals" | "consultation" | "prescription" | "history">("vitals");
 
   // Prescription Form State
   const [diagnosis, setDiagnosis] = useState("");
@@ -102,7 +108,6 @@ export default function DoctorClient({
       const res = await fetch(`/api/visits/${visitId}/call`, { method: "POST" });
       const data = await res.json();
       if (res.ok) {
-        // Refresh visits
         const updated = visits.map((v) =>
           v.id === visitId ? { ...v, status: "IN_CONSULTATION" } : v
         );
@@ -194,7 +199,6 @@ export default function DoctorClient({
       setPrescriptionToPrint(data.prescription);
       setSuccessMsg("Prescription saved and consultation marked complete.");
 
-      // Refresh list
       const updated = visits.map((v) =>
         v.id === activeVisit.id ? { ...v, status: "COMPLETED" } : v
       );
@@ -217,23 +221,26 @@ export default function DoctorClient({
       )}
 
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1 border-b border-[#E3E9EF]">
         <div>
-          <h1 className="font-display font-extrabold text-2xl tracking-tight text-neutral-900 dark:text-white">
-            Physician Consultation Console
+          <h1 className="font-display font-bold text-2xl tracking-tight text-[#1B2733]">
+            Doctor Consultation Console
           </h1>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-            Prescription writing with medicine autocomplete and hospital letterhead print.
+          <p className="text-sm text-[#5B6B7B] mt-0.5">
+            Examine patients, record vitals, write electronic prescriptions, and print official A4 letterheads.
           </p>
         </div>
 
         {/* Doctor Selector */}
         <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold text-neutral-500">Doctor Room:</span>
+          <label htmlFor="doctorSelect" className="text-xs font-semibold text-[#5B6B7B]">
+            Consulting Physician:
+          </label>
           <select
+            id="doctorSelect"
             value={selectedDoctorId}
             onChange={(e) => setSelectedDoctorId(e.target.value)}
-            className="bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-xs font-bold text-neutral-900 dark:text-white outline-none"
+            className="bg-white border border-[#E3E9EF] rounded-lg px-3.5 py-2 text-xs font-semibold text-[#1B2733] shadow-sm outline-none focus:border-[#0B4F8A]"
           >
             {doctors.map((d) => (
               <option key={d.id} value={d.id}>
@@ -244,22 +251,22 @@ export default function DoctorClient({
         </div>
       </div>
 
-      {/* Main Console Split: Left Queue List / Right Active Prescription */}
+      {/* Main Console Split: Left Queue List / Right Active Consultation */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Side: Today's Doctor Queue (Col 4) */}
-        <div className="lg:col-span-4 rounded-2xl bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 p-5 shadow-card-soft space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-white/10">
-            <span className="font-bold text-xs uppercase text-neutral-400">
-              Today’s Patient Queue ({doctorVisits.length})
+        {/* Left Side: Today's Patient Queue (Col 4) */}
+        <div className="lg:col-span-4 rounded-xl bg-white border border-[#E3E9EF] p-5 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E3E9EF]">
+            <span className="font-semibold text-xs uppercase tracking-wider text-[#5B6B7B]">
+              Today’s Queue ({doctorVisits.length})
             </span>
-            <span className="text-[11px] font-mono text-teal-600 dark:text-teal-400 font-bold">
+            <span className="text-xs font-bold text-[#0B4F8A] bg-[#E8F1F9] px-2.5 py-0.5 rounded-full">
               {waitingVisits.length} Waiting
             </span>
           </div>
 
-          <div className="space-y-2 max-h-[600px] overflow-y-auto">
+          <div className="space-y-2.5 max-h-[640px] overflow-y-auto pr-1">
             {doctorVisits.length === 0 ? (
-              <div className="py-8 text-center text-xs text-neutral-400">
+              <div className="py-12 text-center text-xs text-[#8A97A5]">
                 No patients queued for {currentDoctor.name} today.
               </div>
             ) : (
@@ -271,36 +278,36 @@ export default function DoctorClient({
                   <div
                     key={v.id}
                     onClick={() => setActiveVisit(v)}
-                    className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                    className={`p-3.5 rounded-lg border cursor-pointer transition-all ${
                       isActive
-                        ? "bg-teal-50 dark:bg-teal-950/40 border-teal-500 shadow-sm"
-                        : "bg-neutral-50 dark:bg-[#11171E] border-neutral-200 dark:border-white/5 hover:border-neutral-300"
+                        ? "bg-[#E8F1F9] border-[#0B4F8A] shadow-sm"
+                        : "bg-white border-[#E3E9EF] hover:border-[#0B4F8A]/40"
                     }`}
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-black text-lg text-teal-600 dark:text-teal-400">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5">
+                        <span className="font-mono font-bold text-lg text-[#0B4F8A] bg-white border border-[#E3E9EF] w-9 h-9 rounded-lg flex items-center justify-center shrink-0">
                           #{v.tokenNumber}
                         </span>
                         <div>
-                          <span className="font-bold text-xs text-neutral-900 dark:text-white block">
+                          <span className="font-semibold text-sm text-[#1B2733] block">
                             {v.patient.fullName}
                           </span>
-                          <span className="text-[10px] text-neutral-500">
+                          <span className="text-xs text-[#5B6B7B]">
                             MR: {v.patient.mrNumber} • {v.patient.age || "—"} Yrs ({v.patient.gender})
                           </span>
                         </div>
                       </div>
 
                       <span
-                        className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                        className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full ${
                           v.status === "IN_CONSULTATION"
-                            ? "bg-blue-500 text-white animate-pulse"
+                            ? "bg-[#0B4F8A] text-white"
                             : v.status === "COMPLETED"
-                            ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-300"
+                            ? "bg-[#E6F5F3] text-[#1E9E8F]"
                             : isEmergency
-                            ? "bg-red-500 text-white font-black"
-                            : "bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300"
+                            ? "bg-red-600 text-white font-bold"
+                            : "bg-amber-50 text-amber-800 border border-amber-200"
                         }`}
                       >
                         {v.status.replace("_", " ")}
@@ -308,15 +315,16 @@ export default function DoctorClient({
                     </div>
 
                     {v.status === "WAITING" && (
-                      <div className="mt-2.5 pt-2 border-t border-neutral-200/50 dark:border-white/5 flex justify-end">
+                      <div className="mt-3 pt-2.5 border-t border-[#E3E9EF] flex justify-end">
                         <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleCallCurrent(v.id);
                           }}
-                          className="px-2.5 py-1 rounded bg-teal-500 hover:bg-teal-600 text-black font-bold text-[11px] flex items-center gap-1"
+                          className="px-3 py-1 rounded-lg bg-[#1E9E8F] hover:bg-[#167C70] text-white font-medium text-xs flex items-center gap-1.5 transition-colors shadow-sm"
                         >
-                          <Volume2 className="w-3 h-3" />
+                          <Volume2 className="w-3.5 h-3.5" />
                           <span>Call Patient</span>
                         </button>
                       </div>
@@ -328,27 +336,28 @@ export default function DoctorClient({
           </div>
         </div>
 
-        {/* Right Side: Active Consultation & Prescription Form (Col 8) */}
-        <div className="lg:col-span-8 rounded-2xl bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 p-6 shadow-card-soft space-y-6">
+        {/* Right Side: Active Consultation Console (Col 8) */}
+        <div className="lg:col-span-8 rounded-xl bg-white border border-[#E3E9EF] p-6 shadow-sm space-y-6">
           {!activeVisit ? (
-            <div className="py-16 text-center text-xs text-neutral-400 space-y-2">
-              <Stethoscope className="w-10 h-10 text-neutral-400 mx-auto" />
-              <p>Select a patient from the left queue to begin consultation and prescription.</p>
+            <div className="py-20 text-center text-sm text-[#8A97A5] space-y-3">
+              <Stethoscope className="w-12 h-12 text-[#8A97A5] mx-auto" />
+              <p className="font-medium text-[#1B2733]">No patient selected</p>
+              <p className="text-xs text-[#5B6B7B]">Select a patient from the queue on the left to start consultation.</p>
             </div>
           ) : (
-            <form onSubmit={handleSavePrescription} className="space-y-6 text-xs">
-              {/* Patient Banner */}
-              <div className="p-4 rounded-xl bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-teal-500 text-black font-bold text-sm flex items-center justify-center">
+            <form onSubmit={handleSavePrescription} className="space-y-6">
+              {/* Patient Header Banner */}
+              <div className="p-4 rounded-xl bg-[#F6F9FC] border border-[#E3E9EF] flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-lg bg-[#0B4F8A] text-white font-bold text-base flex items-center justify-center shadow-sm">
                     #{activeVisit.tokenNumber}
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-neutral-900 dark:text-white">
+                    <h3 className="font-bold text-base text-[#1B2733]">
                       {activeVisit.patient.fullName}
                     </h3>
-                    <span className="text-[11px] text-neutral-500">
-                      MR: {activeVisit.patient.mrNumber} • {activeVisit.patient.gender} • {activeVisit.patient.age || "—"} Yrs • Phone: {activeVisit.patient.mobile}
+                    <span className="text-xs text-[#5B6B7B]">
+                      MR No: <strong className="text-[#1B2733]">{activeVisit.patient.mrNumber}</strong> • {activeVisit.patient.gender} • {activeVisit.patient.age || "—"} Years • Phone: {activeVisit.patient.mobile}
                     </span>
                   </div>
                 </div>
@@ -357,7 +366,7 @@ export default function DoctorClient({
                   <button
                     type="button"
                     onClick={() => handleCallCurrent(activeVisit.id)}
-                    className="btn-pill bg-teal-500 hover:bg-teal-600 text-black text-xs font-bold gap-1.5 py-1.5"
+                    className="px-4 py-2 rounded-lg bg-[#1E9E8F] hover:bg-[#167C70] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
                   >
                     <Volume2 className="w-3.5 h-3.5" />
                     <span>Call to Room {currentDoctor.roomNo}</span>
@@ -365,63 +374,121 @@ export default function DoctorClient({
                 )}
               </div>
 
-              {/* Allergies Alert Banner */}
-              {activeVisit.patient.allergies && (
-                <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 font-bold flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 shrink-0 text-red-500" />
-                  <span>CRITICAL ALLERGY ALERT: {activeVisit.patient.allergies}</span>
+              {/* Critical Allergy Alert Banner */}
+              {activeVisit.patient.allergies && activeVisit.patient.allergies.toLowerCase() !== "none" && (
+                <div className="p-3.5 bg-red-50 border border-red-200 rounded-lg text-red-700 font-semibold text-xs flex items-center gap-2.5">
+                  <ShieldAlert className="w-4 h-4 shrink-0 text-red-600" />
+                  <span>
+                    <strong>CRITICAL ALLERGY ALERT:</strong> {activeVisit.patient.allergies}
+                  </span>
                 </div>
               )}
 
-              {/* Vitals Recording Row */}
-              <div>
-                <span className="font-bold uppercase text-[10px] tracking-wider text-neutral-400 block mb-2">
-                  Patient Vitals
-                </span>
+              {/* Tabs Navigation for Doctor Detail Sections */}
+              <div className="border-b border-[#E3E9EF] flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("vitals")}
+                  className={`pb-3 px-3 text-xs font-semibold flex items-center gap-1.5 border-b-2 transition-all ${
+                    activeTab === "vitals"
+                      ? "border-[#0B4F8A] text-[#0B4F8A]"
+                      : "border-transparent text-[#5B6B7B] hover:text-[#1B2733]"
+                  }`}
+                >
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>Vitals & Examination</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("consultation")}
+                  className={`pb-3 px-3 text-xs font-semibold flex items-center gap-1.5 border-b-2 transition-all ${
+                    activeTab === "consultation"
+                      ? "border-[#0B4F8A] text-[#0B4F8A]"
+                      : "border-transparent text-[#5B6B7B] hover:text-[#1B2733]"
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Consultation Notes</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("prescription")}
+                  className={`pb-3 px-3 text-xs font-semibold flex items-center gap-1.5 border-b-2 transition-all ${
+                    activeTab === "prescription"
+                      ? "border-[#0B4F8A] text-[#0B4F8A]"
+                      : "border-transparent text-[#5B6B7B] hover:text-[#1B2733]"
+                  }`}
+                >
+                  <Pill className="w-3.5 h-3.5" />
+                  <span>Prescription (Rx)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("history")}
+                  className={`pb-3 px-3 text-xs font-semibold flex items-center gap-1.5 border-b-2 transition-all ${
+                    activeTab === "history"
+                      ? "border-[#0B4F8A] text-[#0B4F8A]"
+                      : "border-transparent text-[#5B6B7B] hover:text-[#1B2733]"
+                  }`}
+                >
+                  <History className="w-3.5 h-3.5" />
+                  <span>Patient History</span>
+                </button>
+              </div>
+
+              {/* Section 1: Vitals & Examination */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#5B6B7B]">
+                    Vitals & Examination
+                  </h4>
+                  <span className="text-[11px] text-[#8A97A5]">Recorded during triage</span>
+                </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                  <div>
-                    <span className="text-[10px] text-neutral-500 block mb-0.5">BP (mmHg)</span>
+                  <div className="bg-[#F6F9FC] p-3 rounded-lg border border-[#E3E9EF]">
+                    <span className="text-[11px] font-semibold text-[#5B6B7B] block mb-1">BP (mmHg)</span>
                     <input
                       type="text"
                       value={bp}
                       onChange={(e) => setBp(e.target.value)}
-                      className="w-full bg-neutral-50 dark:bg-black/30 border border-neutral-200 dark:border-white/10 rounded-lg p-2 font-mono text-center text-xs"
+                      className="w-full bg-white border border-[#E3E9EF] rounded-md py-1.5 px-2 font-mono text-center text-xs font-semibold text-[#1B2733] outline-none focus:border-[#0B4F8A]"
                     />
                   </div>
-                  <div>
-                    <span className="text-[10px] text-neutral-500 block mb-0.5">Pulse (bpm)</span>
+                  <div className="bg-[#F6F9FC] p-3 rounded-lg border border-[#E3E9EF]">
+                    <span className="text-[11px] font-semibold text-[#5B6B7B] block mb-1">Pulse (bpm)</span>
                     <input
                       type="text"
                       value={pulse}
                       onChange={(e) => setPulse(e.target.value)}
-                      className="w-full bg-neutral-50 dark:bg-black/30 border border-neutral-200 dark:border-white/10 rounded-lg p-2 font-mono text-center text-xs"
+                      className="w-full bg-white border border-[#E3E9EF] rounded-md py-1.5 px-2 font-mono text-center text-xs font-semibold text-[#1B2733] outline-none focus:border-[#0B4F8A]"
                     />
                   </div>
-                  <div>
-                    <span className="text-[10px] text-neutral-500 block mb-0.5">Temp (°F)</span>
+                  <div className="bg-[#F6F9FC] p-3 rounded-lg border border-[#E3E9EF]">
+                    <span className="text-[11px] font-semibold text-[#5B6B7B] block mb-1">Temp (°F)</span>
                     <input
                       type="text"
                       value={temp}
                       onChange={(e) => setTemp(e.target.value)}
-                      className="w-full bg-neutral-50 dark:bg-black/30 border border-neutral-200 dark:border-white/10 rounded-lg p-2 font-mono text-center text-xs"
+                      className="w-full bg-white border border-[#E3E9EF] rounded-md py-1.5 px-2 font-mono text-center text-xs font-semibold text-[#1B2733] outline-none focus:border-[#0B4F8A]"
                     />
                   </div>
-                  <div>
-                    <span className="text-[10px] text-neutral-500 block mb-0.5">Weight (kg)</span>
+                  <div className="bg-[#F6F9FC] p-3 rounded-lg border border-[#E3E9EF]">
+                    <span className="text-[11px] font-semibold text-[#5B6B7B] block mb-1">Weight (kg)</span>
                     <input
                       type="text"
                       value={weight}
                       onChange={(e) => setWeight(e.target.value)}
-                      className="w-full bg-neutral-50 dark:bg-black/30 border border-neutral-200 dark:border-white/10 rounded-lg p-2 font-mono text-center text-xs"
+                      className="w-full bg-white border border-[#E3E9EF] rounded-md py-1.5 px-2 font-mono text-center text-xs font-semibold text-[#1B2733] outline-none focus:border-[#0B4F8A]"
                     />
                   </div>
-                  <div>
-                    <span className="text-[10px] text-neutral-500 block mb-0.5">SpO2 (%)</span>
+                  <div className="bg-[#F6F9FC] p-3 rounded-lg border border-[#E3E9EF]">
+                    <span className="text-[11px] font-semibold text-[#5B6B7B] block mb-1">SpO2 (%)</span>
                     <input
                       type="text"
                       value={spo2}
                       onChange={(e) => setSpo2(e.target.value)}
-                      className="w-full bg-neutral-50 dark:bg-black/30 border border-neutral-200 dark:border-white/10 rounded-lg p-2 font-mono text-center text-xs"
+                      className="w-full bg-white border border-[#E3E9EF] rounded-md py-1.5 px-2 font-mono text-center text-xs font-semibold text-[#1B2733] outline-none focus:border-[#0B4F8A]"
                     />
                   </div>
                 </div>
@@ -430,8 +497,8 @@ export default function DoctorClient({
               {/* Diagnosis & Symptoms */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-neutral-700 dark:text-neutral-300 font-semibold mb-1">
-                    Provisional Diagnosis *
+                  <label className="block text-xs font-semibold text-[#1B2733] mb-1">
+                    Provisional Diagnosis <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -439,12 +506,12 @@ export default function DoctorClient({
                     placeholder="e.g. Acute Pharyngitis / Type 2 Diabetes"
                     value={diagnosis}
                     onChange={(e) => setDiagnosis(e.target.value)}
-                    className="w-full bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-neutral-900 dark:text-white outline-none focus:border-teal-500"
+                    className="w-full bg-white border border-[#E3E9EF] rounded-lg px-3.5 py-2.5 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A] shadow-sm font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-neutral-700 dark:text-neutral-300 font-semibold mb-1">
+                  <label className="block text-xs font-semibold text-[#1B2733] mb-1">
                     Symptoms & Complaints
                   </label>
                   <input
@@ -452,69 +519,73 @@ export default function DoctorClient({
                     placeholder="e.g. Fever, dry cough, body aches for 3 days"
                     value={symptoms}
                     onChange={(e) => setSymptoms(e.target.value)}
-                    className="w-full bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-neutral-900 dark:text-white outline-none focus:border-teal-500"
+                    className="w-full bg-white border border-[#E3E9EF] rounded-lg px-3.5 py-2.5 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A] shadow-sm font-medium"
                   />
                 </div>
               </div>
 
+              {/* Clinical Notes */}
               <div>
-                <label className="block text-neutral-700 dark:text-neutral-300 font-semibold mb-1">
+                <label className="block text-xs font-semibold text-[#1B2733] mb-1">
                   Clinical Examination & Laboratory Orders
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="Clinical notes, CBC, Blood Sugar Fasting, Chest X-Ray..."
+                  placeholder="Clinical notes, chest examination, CBC, Blood Sugar Fasting, Chest X-Ray..."
                   value={clinicalNotes}
                   onChange={(e) => setClinicalNotes(e.target.value)}
-                  className="w-full bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl p-3 text-neutral-900 dark:text-white outline-none focus:border-teal-500 resize-none"
+                  className="w-full bg-white border border-[#E3E9EF] rounded-lg p-3 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A] shadow-sm resize-none"
                 />
               </div>
 
               {/* Prescription Items (℞) with Autocomplete */}
-              <div className="space-y-3 pt-2 border-t border-neutral-200 dark:border-white/10">
+              <div className="space-y-3 pt-3 border-t border-[#E3E9EF]">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-serif italic font-bold text-lg text-teal-600">℞</span>
-                    <span className="font-bold text-xs uppercase text-neutral-700 dark:text-neutral-300">
-                      Prescription Medicines (Autocomplete Enabled)
+                    <span className="font-serif italic font-bold text-xl text-[#0B4F8A]">℞</span>
+                    <span className="font-semibold text-xs uppercase tracking-wider text-[#1B2733]">
+                      Prescribed Medications (Search catalog)
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={handleAddMedicineRow}
-                    className="px-2.5 py-1 rounded-lg bg-teal-500/10 hover:bg-teal-500 text-teal-700 hover:text-black dark:text-teal-300 font-bold text-[11px] flex items-center gap-1 transition-colors"
+                    className="px-3 py-1.5 rounded-lg bg-[#E8F1F9] hover:bg-[#0B4F8A] text-[#0B4F8A] hover:text-white font-semibold text-xs flex items-center gap-1.5 transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Medicine</span>
                   </button>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {items.map((item, idx) => (
-                    <div key={idx} className="relative p-3 rounded-xl bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 grid grid-cols-12 gap-2 items-center">
-                      {/* Medicine Name with Autocomplete Dropdown */}
+                    <div
+                      key={idx}
+                      className="relative p-3 rounded-lg bg-[#F6F9FC] border border-[#E3E9EF] grid grid-cols-12 gap-2.5 items-center"
+                    >
+                      {/* Medicine Name with Autocomplete */}
                       <div className="col-span-12 sm:col-span-4 relative">
-                        <span className="text-[10px] text-neutral-400 block mb-0.5">Medicine Name</span>
+                        <span className="text-[10px] font-semibold text-[#5B6B7B] block mb-1">Medicine Name</span>
                         <input
                           type="text"
                           required
                           placeholder="Type Panadol, Augmentin, Risek..."
                           value={item.medicineName}
                           onChange={(e) => handleMedicineNameChange(e.target.value, idx)}
-                          className="w-full bg-white dark:bg-black/30 border border-neutral-200 dark:border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-neutral-900 dark:text-white outline-none focus:border-teal-500 font-semibold"
+                          className="w-full bg-white border border-[#E3E9EF] rounded-md px-2.5 py-1.5 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A] font-medium"
                         />
 
                         {/* Autocomplete Popup */}
                         {activeItemIndex === idx && autocompleteResults.length > 0 && (
-                          <div className="absolute top-full left-0 right-0 z-30 mt-1 bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 rounded-xl shadow-xl max-h-40 overflow-y-auto">
+                          <div className="absolute top-full left-0 right-0 z-30 mt-1 bg-white border border-[#E3E9EF] rounded-lg shadow-lg max-h-48 overflow-y-auto">
                             {autocompleteResults.map((med) => (
                               <div
                                 key={med.id}
                                 onClick={() => handleSelectMedicineMatch(med, idx)}
-                                className="p-2 hover:bg-teal-50 dark:hover:bg-teal-950/40 cursor-pointer border-b border-neutral-100 dark:border-white/5"
+                                className="p-2.5 hover:bg-[#E8F1F9] cursor-pointer border-b border-[#E3E9EF] last:border-none"
                               >
-                                <span className="font-bold text-neutral-900 dark:text-white block">{med.name}</span>
-                                <span className="text-[10px] text-neutral-500">
+                                <span className="font-semibold text-xs text-[#1B2733] block">{med.name}</span>
+                                <span className="text-[10px] text-[#5B6B7B]">
                                   {med.genericName} • {med.category}
                                 </span>
                               </div>
@@ -525,7 +596,7 @@ export default function DoctorClient({
 
                       {/* Dosage */}
                       <div className="col-span-6 sm:col-span-2">
-                        <span className="text-[10px] text-neutral-400 block mb-0.5">Dosage</span>
+                        <span className="text-[10px] font-semibold text-[#5B6B7B] block mb-1">Dosage</span>
                         <input
                           type="text"
                           required
@@ -535,13 +606,13 @@ export default function DoctorClient({
                             updated[idx].dosage = e.target.value;
                             setItems(updated);
                           }}
-                          className="w-full bg-white dark:bg-black/30 border border-neutral-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-neutral-900 dark:text-white outline-none"
+                          className="w-full bg-white border border-[#E3E9EF] rounded-md px-2 py-1.5 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A]"
                         />
                       </div>
 
                       {/* Frequency */}
                       <div className="col-span-6 sm:col-span-2">
-                        <span className="text-[10px] text-neutral-400 block mb-0.5">Frequency</span>
+                        <span className="text-[10px] font-semibold text-[#5B6B7B] block mb-1">Frequency</span>
                         <select
                           value={item.frequency}
                           onChange={(e) => {
@@ -549,7 +620,7 @@ export default function DoctorClient({
                             updated[idx].frequency = e.target.value;
                             setItems(updated);
                           }}
-                          className="w-full bg-white dark:bg-black/30 border border-neutral-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-neutral-900 dark:text-white outline-none font-semibold text-teal-600 dark:text-teal-400"
+                          className="w-full bg-white border border-[#E3E9EF] rounded-md px-2 py-1.5 text-xs text-[#0B4F8A] font-semibold outline-none focus:border-[#0B4F8A]"
                         >
                           <option value="1-0-0">1-0-0 (Morning)</option>
                           <option value="0-0-1">0-0-1 (Night)</option>
@@ -560,8 +631,8 @@ export default function DoctorClient({
                       </div>
 
                       {/* Duration */}
-                      <div className="col-span-8 sm:col-span-3">
-                        <span className="text-[10px] text-neutral-400 block mb-0.5">Duration / Instructions</span>
+                      <div className="col-span-10 sm:col-span-3">
+                        <span className="text-[10px] font-semibold text-[#5B6B7B] block mb-1">Duration / Instructions</span>
                         <input
                           type="text"
                           value={item.duration}
@@ -571,16 +642,17 @@ export default function DoctorClient({
                             updated[idx].duration = e.target.value;
                             setItems(updated);
                           }}
-                          className="w-full bg-white dark:bg-black/30 border border-neutral-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-neutral-900 dark:text-white outline-none"
+                          className="w-full bg-white border border-[#E3E9EF] rounded-md px-2 py-1.5 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A]"
                         />
                       </div>
 
-                      {/* Delete */}
-                      <div className="col-span-4 sm:col-span-1 flex justify-end pt-3">
+                      {/* Delete Row */}
+                      <div className="col-span-2 sm:col-span-1 flex justify-end pt-3">
                         <button
                           type="button"
                           onClick={() => handleRemoveMedicineRow(idx)}
-                          className="p-1.5 text-neutral-400 hover:text-red-500"
+                          className="p-1.5 text-[#8A97A5] hover:text-red-600 rounded"
+                          title="Remove row"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -593,7 +665,7 @@ export default function DoctorClient({
               {/* Follow-up Note */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-neutral-700 dark:text-neutral-300 font-semibold mb-1">
+                  <label className="block text-xs font-semibold text-[#1B2733] mb-1">
                     Follow-Up Date / Advice
                   </label>
                   <input
@@ -601,15 +673,15 @@ export default function DoctorClient({
                     value={followUp}
                     onChange={(e) => setFollowUp(e.target.value)}
                     placeholder="e.g. Return in 5 days or if symptoms worsen"
-                    className="w-full bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-neutral-900 dark:text-white outline-none focus:border-teal-500"
+                    className="w-full bg-white border border-[#E3E9EF] rounded-lg px-3.5 py-2 text-xs text-[#1B2733] outline-none focus:border-[#0B4F8A] shadow-sm"
                   />
                 </div>
               </div>
 
-              {/* Submit Buttons */}
-              <div className="pt-4 border-t border-neutral-200 dark:border-white/10 flex items-center justify-between">
+              {/* Form Action Footer */}
+              <div className="pt-4 border-t border-[#E3E9EF] flex items-center justify-between">
                 {successMsg && (
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5">
+                  <span className="text-[#2E9E6B] font-semibold text-xs flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" />
                     <span>{successMsg}</span>
                   </span>
@@ -619,7 +691,7 @@ export default function DoctorClient({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="btn-pill bg-teal-500 hover:bg-teal-600 text-black text-xs font-bold uppercase tracking-wider gap-2 shadow-glow-teal"
+                    className="px-5 py-2.5 rounded-lg bg-[#0B4F8A] hover:bg-[#093F6E] text-white text-xs font-semibold flex items-center gap-2 transition-colors shadow-sm disabled:opacity-50"
                   >
                     <Printer className="w-4 h-4" />
                     <span>Save & Print A4 Prescription</span>

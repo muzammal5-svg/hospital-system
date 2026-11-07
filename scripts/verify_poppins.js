@@ -11,9 +11,9 @@ async function main() {
   await page.waitForTimeout(1000);
 
   const styles = await page.evaluate(() => {
-    const h1 = document.querySelector('h1');
+    const h1 = document.querySelector('h1') || document.body;
     const body = document.body;
-    const btn = document.querySelector('.btn-pill');
+    const btn = document.querySelector('.btn-pill, button, a') || document.body;
     return {
       bodyFont: window.getComputedStyle(body).fontFamily,
       h1Font: window.getComputedStyle(h1).fontFamily,

@@ -1,32 +1,27 @@
 import React from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { AiInsightCards } from "@/components/AiInsightCards";
+import { QueueAlertsCards } from "@/components/QueueAlertsCards";
+import { DoctorsSection } from "./DoctorsSection";
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
 import {
-  Activity,
-  ArrowRight,
-  Clock,
   Calendar,
+  Phone,
+  Clock,
   CheckCircle2,
   Users,
-  Shield,
+  ShieldCheck,
   Tv,
-  Printer,
-  ChevronRight,
-  Phone,
-  MapPin,
-  Sparkles,
+  ArrowRight,
   HeartPulse,
-  Brain,
-  Bone,
-  Stethoscope,
-  Eye,
-  Ear,
-  Baby,
+  MapPin,
+  Mail,
+  UserCheck,
+  FileText,
+  Activity,
 } from "lucide-react";
-import { formatPKR } from "@/lib/utils";
 import PublicBookingForm from "./PublicBookingForm";
 import PublicContactForm from "./PublicContactForm";
 
@@ -34,594 +29,721 @@ export const dynamic = "force-dynamic";
 
 export default async function LandingPage() {
   const [departments, doctors, profile] = await Promise.all([
-    prisma.department.findMany({ take: 10 }),
-    prisma.doctor.findMany({ include: { department: true }, take: 8 }),
+    prisma.department.findMany({
+      where: { active: true },
+      take: 10,
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.doctor.findMany({
+      where: { active: true },
+      include: { department: true },
+      take: 8,
+      orderBy: { createdAt: "asc" },
+    }),
     prisma.hospitalProfile.findUnique({ where: { id: "default" } }),
   ]);
 
+  // Department image lookup
+  const deptImages: Record<string, string> = {
+    CARD: "/images/departments/cardiology.webp",
+    ORTH: "/images/departments/orthopedics.webp",
+    PED: "/images/departments/pediatrics.webp",
+    GYN: "/images/departments/gynecology.webp",
+    MED: "/images/departments/internal-medicine.webp",
+    SURG: "/images/departments/general-surgery.webp",
+    NEUR: "/images/departments/neurology.webp",
+    OPHT: "/images/departments/ophthalmology.webp",
+    ENT: "/images/departments/ent.webp",
+    DERM: "/images/departments/dermatology.webp",
+  };
+
   return (
-    <div className="bg-[#050505] text-[#EDE8E0] min-h-screen selection:bg-teal-500 selection:text-black">
-      {/* 1. Sticky Navbar */}
+    <div className="bg-[#F6F9FC] dark:bg-[#0F1B2A] text-[#1B2733] dark:text-[#E6EEF5] min-h-screen">
+      {/* 1. Navbar */}
       <Navbar />
 
       <main>
-        {/* 2. Hero Section */}
-        <section className="relative min-h-[92vh] flex items-center justify-center pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden bg-gradient-to-b from-[#07161f] via-[#05090e] to-[#050505]">
-          {/* Subtle glow / grid ambient background */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(14,165,164,0.22)_0%,rgba(7,22,31,0.5)_45%,transparent_75%)] pointer-events-none" />
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[450px] bg-teal-500/12 blur-[150px] rounded-full pointer-events-none" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+        {/* 2. Hero Section (Light, Split Layout) */}
+        <section className="relative bg-gradient-to-b from-[#E8F1F9] via-[#F6F9FC] to-white dark:from-[#111F30] dark:via-[#0F1B2A] dark:to-[#0F1B2A] pt-12 pb-16 md:pt-20 md:pb-24 border-b border-[#E3E9EF] dark:border-[#23374D]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center min-h-[520px]">
+              {/* Left Column: Headline, Subtext, Buttons, Trust Points */}
+              <div className="lg:col-span-7 space-y-6 text-left">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-[#E8F1F9] dark:bg-[#162638] border border-[#0B4F8A]/20 text-[#0B4F8A] dark:text-[#64B5F6] text-xs font-semibold uppercase tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-[#1E9E8F]" />
+                  <span>Naseem Ijaz Hospital &bull; Lahore</span>
+                </div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-            {/* Tag Badge */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-teal-500/30 bg-teal-500/10 text-teal-300 text-xs font-bold tracking-widest uppercase mb-8 shadow-glow-teal animate-in fade-in">
-              <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-              <span>Next-Generation Hospital Reception & OPD System</span>
-            </div>
+                <h1 className="text-4xl sm:text-5xl lg:text-5xl font-bold font-heading tracking-tight text-[#0B4F8A] dark:text-white leading-[1.15]">
+                  Quality Healthcare, <br />
+                  <span className="text-[#1E9E8F]">Close to Home.</span>
+                </h1>
 
-            {/* Giant Fluid Hero Heading */}
-            <h1 className="hero-headline text-white max-w-5xl mx-auto">
-              Smarter care starts <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-teal-200 to-[#EDE8E0]">
-                at the front desk.
-              </span>
-            </h1>
+                <p className="text-base sm:text-lg text-[#5B6B7B] dark:text-[#94A7BA] max-w-2xl leading-relaxed">
+                  Naseem Ijaz Hospital provides trusted consultation, diagnostics and emergency care in Lahore. With experienced consultants, fast OPD registration, and on-site pharmacy, your family is in caring hands.
+                </p>
 
-            {/* Subtext */}
-            <p className="mt-8 text-base sm:text-xl text-[#9A958C] max-w-3xl mx-auto leading-relaxed font-sans font-normal">
-              Naseem Ijaz Hospital’s complete outpatient operations suite. 30-second patient intake, real-time live doctor queues, waiting room TV displays, and automated thermal receipts.
-            </p>
+                {/* 2 Buttons */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+                  <Link
+                    href="/appointments"
+                    className="btn-teal px-6 py-3 text-sm font-semibold shadow-sm justify-center"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    <span>Book Appointment</span>
+                  </Link>
 
-            {/* Hero CTAs */}
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/appointments"
-                className="btn-pill bg-teal-500 hover:bg-teal-400 text-black shadow-glow-teal gap-3 hover:scale-105 transition-all w-full sm:w-auto"
-              >
-                <span>Book Doctor Appointment</span>
-                <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-              </Link>
+                  <Link
+                    href="/login"
+                    className="btn-secondary px-6 py-3 text-sm font-semibold justify-center"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-[#0B4F8A]" />
+                    <span>Staff Login</span>
+                  </Link>
+                </div>
 
-              <Link
-                href="/login"
-                className="btn-pill bg-[#EDE8E0] hover:bg-white text-black gap-2 hover:shadow-glow-bone transition-all w-full sm:w-auto"
-              >
-                <Shield className="w-4 h-4" />
-                <span>Staff Portal / Live Demo</span>
-              </Link>
-            </div>
-
-            {/* Mini Trust Metrics Bar */}
-            <div className="mt-20 pt-8 border-t border-white/[0.08] grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto text-left">
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                <span className="text-2xl sm:text-3xl font-extrabold font-display text-white block">30 Sec</span>
-                <span className="text-xs text-[#9A958C]">Avg. Patient Registration</span>
+                {/* 3 Trust Points */}
+                <div className="pt-6 border-t border-[#E3E9EF] dark:border-[#23374D] flex flex-wrap items-center gap-6 sm:gap-8 text-xs text-[#5B6B7B] dark:text-[#94A7BA]">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#1E9E8F] shrink-0" />
+                    <span className="font-medium text-[#1B2733] dark:text-[#E6EEF5]">24/7 Emergency Care</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#1E9E8F] shrink-0" />
+                    <span className="font-medium text-[#1B2733] dark:text-[#E6EEF5]">Experienced Consultants</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#1E9E8F] shrink-0" />
+                    <span className="font-medium text-[#1B2733] dark:text-[#E6EEF5]">Online Appointments</span>
+                  </div>
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                <span className="text-2xl sm:text-3xl font-extrabold font-display text-white block">100% Real-time</span>
-                <span className="text-xs text-[#9A958C]">SSE Live TV Queue Stream</span>
-              </div>
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                <span className="text-2xl sm:text-3xl font-extrabold font-display text-white block">80mm & A4</span>
-                <span className="text-xs text-[#9A958C]">Thermal Slip & Rx Letterhead</span>
-              </div>
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                <span className="text-2xl sm:text-3xl font-extrabold font-display text-white block">English + اردو</span>
-                <span className="text-xs text-[#9A958C]">Full Bilingual RTL Mode</span>
+
+              {/* Right Column: Large Real Hospital Photo */}
+              <div className="lg:col-span-5 relative">
+                <div className="relative rounded-2xl overflow-hidden border border-[#E3E9EF] dark:border-[#23374D] shadow-md aspect-[4/3] bg-[#E8F1F9]">
+                  <Image
+                    src="/images/hero-hospital.webp"
+                    alt="Naseem Ijaz Hospital Medical Team"
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="object-cover"
+                  />
+                </div>
+
+                {/* Floating OPD Status Card */}
+                <div className="absolute -bottom-5 -left-4 sm:bottom-4 sm:left-4 bg-white dark:bg-[#162638] border border-[#E3E9EF] dark:border-[#23374D] rounded-xl p-3.5 shadow-lg flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[#E6F5F3] dark:bg-teal-950/60 text-[#1E9E8F] flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2E9E6B] animate-pulse" />
+                      <span className="text-xs font-bold text-[#1B2733] dark:text-[#E6EEF5]">
+                        OPD Open Today
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-[#5B6B7B] dark:text-[#94A7BA]">
+                      9:00 AM &ndash; 9:00 PM &bull; Jail Road
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 3. "The Product" Strip (Interactive Mockup Preview) */}
-        <section id="features" className="py-28 md:py-36 border-t border-white/[0.08] relative bg-[#050505]">
+        {/* 3. Quick Action Cards (4 Cards) */}
+        <section className="relative -mt-6 z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Card 1 */}
+            <Link
+              href="/appointments"
+              className="hospital-card p-5 hover:border-[#0B4F8A] transition-all group flex items-start gap-4"
+            >
+              <div className="w-11 h-11 rounded-lg bg-[#E8F1F9] dark:bg-[#1E3147] text-[#0B4F8A] dark:text-[#64B5F6] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Calendar className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-[#1B2733] dark:text-[#E6EEF5] font-heading">
+                    Book Appointment
+                  </h3>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#5B6B7B] group-hover:text-[#0B4F8A] transition-colors" />
+                </div>
+                <p className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-1">
+                  Choose your doctor, date, and preferred time slot online.
+                </p>
+              </div>
+            </Link>
+
+            {/* Card 2 */}
+            <Link
+              href="/#doctors"
+              className="hospital-card p-5 hover:border-[#0B4F8A] transition-all group flex items-start gap-4"
+            >
+              <div className="w-11 h-11 rounded-lg bg-[#E6F5F3] dark:bg-teal-950/50 text-[#1E9E8F] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Users className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-[#1B2733] dark:text-[#E6EEF5] font-heading">
+                    Find a Doctor
+                  </h3>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#5B6B7B] group-hover:text-[#0B4F8A] transition-colors" />
+                </div>
+                <p className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-1">
+                  Review consultant profiles, fees, and clinic schedules.
+                </p>
+              </div>
+            </Link>
+
+            {/* Card 3 */}
+            <a
+              href="tel:+924235789999"
+              className="hospital-card p-5 hover:border-red-400 transition-all group flex items-start gap-4 border-l-4 border-l-red-500"
+            >
+              <div className="w-11 h-11 rounded-lg bg-red-50 dark:bg-red-950/40 text-red-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Phone className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-red-600 dark:text-red-400 font-heading">
+                    Emergency 24/7
+                  </h3>
+                  <ArrowRight className="w-3.5 h-3.5 text-red-500" />
+                </div>
+                <p className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-1">
+                  Trauma, cardiac response and ambulance helpline.
+                </p>
+              </div>
+            </a>
+
+            {/* Card 4 */}
+            <Link
+              href="/display"
+              target="_blank"
+              className="hospital-card p-5 hover:border-[#0B4F8A] transition-all group flex items-start gap-4"
+            >
+              <div className="w-11 h-11 rounded-lg bg-[#E8F1F9] dark:bg-[#1E3147] text-[#0B4F8A] dark:text-[#64B5F6] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Tv className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-[#1B2733] dark:text-[#E6EEF5] font-heading">
+                    Live OPD Queue
+                  </h3>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#5B6B7B] group-hover:text-[#0B4F8A] transition-colors" />
+                </div>
+                <p className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-1">
+                  View waiting room tokens and active consultations in real time.
+                </p>
+              </div>
+            </Link>
+          </div>
+        </section>
+
+        {/* 4. About Us Section */}
+        <section id="about" className="py-20 bg-white dark:bg-[#162638] border-b border-[#E3E9EF] dark:border-[#23374D]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <span className="text-xs font-bold uppercase tracking-widest text-teal-400 block mb-3">
-                The Product
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              {/* Photo Left */}
+              <div className="lg:col-span-5 relative">
+                <div className="relative rounded-2xl overflow-hidden border border-[#E3E9EF] dark:border-[#23374D] shadow-sm aspect-[4/3] bg-[#F6F9FC]">
+                  <Image
+                    src="/images/about-building.webp"
+                    alt="Naseem Ijaz Hospital Building, Lahore"
+                    fill
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Text Right */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="text-xs font-bold uppercase tracking-wider text-[#1E9E8F]">
+                  About Our Hospital
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-bold font-heading text-[#0B4F8A] dark:text-white leading-tight">
+                  A Trusted Name in Compassionate Medical Care
+                </h2>
+                <p className="text-sm sm:text-base text-[#5B6B7B] dark:text-[#94A7BA] leading-relaxed">
+                  Founded with a vision to deliver accessible, high-standard healthcare, Naseem Ijaz Hospital is a premier multi-specialty medical facility situated on Jail Road, Lahore.
+                </p>
+                <p className="text-sm sm:text-base text-[#5B6B7B] dark:text-[#94A7BA] leading-relaxed">
+                  With modern outpatient clinics, fully equipped surgical theatres, on-site diagnostics, and dedicated patient care coordinators, our team of seasoned consultants is committed to supporting every patient with dignity and clinical excellence.
+                </p>
+
+                {/* 4 Stat Counters */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-[#E3E9EF] dark:border-[#23374D]">
+                  <div className="p-3.5 bg-[#F6F9FC] dark:bg-[#111B27] rounded-xl border border-[#E3E9EF] dark:border-[#23374D]">
+                    <div className="text-2xl sm:text-3xl font-bold text-[#0B4F8A] dark:text-[#64B5F6] font-heading">
+                      18+
+                    </div>
+                    <div className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-0.5 font-medium">
+                      Years of Service
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 bg-[#F6F9FC] dark:bg-[#111B27] rounded-xl border border-[#E3E9EF] dark:border-[#23374D]">
+                    <div className="text-2xl sm:text-3xl font-bold text-[#1E9E8F] font-heading">
+                      35+
+                    </div>
+                    <div className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-0.5 font-medium">
+                      Consultant Doctors
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 bg-[#F6F9FC] dark:bg-[#111B27] rounded-xl border border-[#E3E9EF] dark:border-[#23374D]">
+                    <div className="text-2xl sm:text-3xl font-bold text-[#0B4F8A] dark:text-[#64B5F6] font-heading">
+                      10+
+                    </div>
+                    <div className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-0.5 font-medium">
+                      Departments
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 bg-[#F6F9FC] dark:bg-[#111B27] rounded-xl border border-[#E3E9EF] dark:border-[#23374D]">
+                    <div className="text-2xl sm:text-3xl font-bold text-[#1E9E8F] font-heading">
+                      120k+
+                    </div>
+                    <div className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-0.5 font-medium">
+                      Patients Treated
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. Departments Grid Section */}
+        <section id="departments" className="py-20 bg-[#F6F9FC] dark:bg-[#0F1B2A] border-b border-[#E3E9EF] dark:border-[#23374D]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#1E9E8F] block mb-2">
+                Specialized Care
               </span>
-              <h2 className="section-headline text-white tracking-tight">
-                An unified cockpit for reception, doctors, and cashiers
+              <h2 className="text-3xl sm:text-4xl font-bold font-heading text-[#0B4F8A] dark:text-white">
+                Clinical Departments
               </h2>
-              <p className="mt-4 text-sm sm:text-base text-[#9A958C]">
-                Designed specifically for high-volume Pakistani hospital workflows with keyboard shortcuts, rapid patient search, and instant doctor room routing.
+              <p className="mt-3 text-sm text-[#5B6B7B] dark:text-[#94A7BA]">
+                Equipped with modern diagnostic capabilities and dedicated outpatient consultation suites.
               </p>
             </div>
 
-            {/* Real App UI Preview Mockup in Dark Browser Frame */}
-            <div className="relative rounded-2xl border border-white/[0.12] bg-[#0B0F14] p-4 sm:p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden">
-              {/* Window Header */}
-              <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.08] text-xs text-[#9A958C]">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                  <span className="ml-3 font-mono text-[11px] text-white/70 bg-white/[0.05] px-3 py-1 rounded-full border border-white/[0.06]">
-                    https://naseem-ijaz-hospital.pk/dashboard/reception
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 font-semibold text-teal-400">
-                  <span className="inline-block w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-                  <span className="text-[11px] uppercase tracking-wider">SSE Active • OPD Live</span>
-                </div>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {departments.map((dept) => {
+                const imgUrl = deptImages[dept.code] || "/images/departments/cardiology.webp";
 
-              {/* Dashboard Grid Simulation */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
-                {/* Reception Intake Column */}
-                <div className="rounded-xl border border-white/[0.08] bg-[#0E131A] p-5 space-y-4">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-                    <span className="font-bold text-white text-sm">Patient Registration</span>
-                    <span className="text-[10px] font-mono text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20">[F2 Shortcut]</span>
-                  </div>
-                  <div className="space-y-2.5">
-                    <div className="p-3 rounded-lg bg-black/50 border border-white/[0.06]">
-                      <span className="text-[10px] uppercase tracking-wider text-neutral-400 block mb-0.5">Assigned MR Number</span>
-                      <span className="font-mono font-bold text-teal-300 text-sm">NIH-2026-000042</span>
-                    </div>
-                    <div className="p-3 rounded-lg bg-black/50 border border-white/[0.06]">
-                      <span className="text-[10px] uppercase tracking-wider text-neutral-400 block mb-0.5">Pakistani CNIC Validation</span>
-                      <span className="font-mono text-white text-xs">35201-1234567-1 <span className="text-emerald-400 font-bold">✓ Verified</span></span>
-                    </div>
-                    <div className="p-3 rounded-lg bg-black/50 border border-white/[0.06]">
-                      <span className="text-[10px] uppercase tracking-wider text-neutral-400 block mb-0.5">Assigned OPD Specialist</span>
-                      <span className="font-semibold text-white text-xs">Dr. Tariq Mahmood (Cardiology • Room 101)</span>
-                    </div>
-                  </div>
-                  <div className="pt-2">
-                    <div className="btn-pill w-full bg-teal-500 text-black text-center text-xs font-bold shadow-glow-teal">
-                      Print 80mm Token Slip
-                    </div>
-                  </div>
-                </div>
+                return (
+                  <div
+                    key={dept.id}
+                    className="hospital-card overflow-hidden group hover:shadow-md transition-shadow flex flex-col justify-between"
+                  >
+                    <div>
+                      {/* Department Photo */}
+                      <div className="relative w-full aspect-[16/10] bg-[#E8F1F9] overflow-hidden">
+                        <Image
+                          src={imgUrl}
+                          alt={dept.name}
+                          fill
+                          loading="lazy"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
 
-                {/* Live Board Column */}
-                <div className="rounded-xl border border-white/[0.08] bg-[#0E131A] p-5 space-y-4">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-                    <span className="font-bold text-white text-sm">OPD Live Queue Board</span>
-                    <span className="text-[10px] text-teal-400 font-semibold bg-teal-500/10 px-2 py-0.5 rounded">4 Doctors Active</span>
-                  </div>
-                  <div className="space-y-2.5 font-mono">
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-teal-950/40 border border-teal-500/30 shadow-glow-teal">
-                      <div>
-                        <span className="font-bold text-teal-300 text-sm">TOKEN #04</span>
-                        <span className="text-[11px] text-neutral-300 block font-sans">Muhammad Ali Khan</span>
+                      <div className="p-5">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="text-base font-bold text-[#1B2733] dark:text-[#E6EEF5] font-heading">
+                            {dept.name}
+                          </h3>
+                        </div>
+                        {dept.nameUrdu && (
+                          <div className="text-xs text-[#1E9E8F] font-urdu mb-2">
+                            {dept.nameUrdu}
+                          </div>
+                        )}
+                        <p className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] leading-relaxed line-clamp-2">
+                          {dept.description || "Comprehensive outpatient diagnostics, treatment, and specialist consultations."}
+                        </p>
                       </div>
-                      <span className="px-2.5 py-1 rounded text-[10px] bg-blue-500/20 text-blue-400 font-bold uppercase tracking-wider border border-blue-500/30">
-                        In Room 101
-                      </span>
                     </div>
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-black/50 border border-white/[0.06]">
-                      <div>
-                        <span className="font-bold text-white text-sm">TOKEN #05</span>
-                        <span className="text-[11px] text-neutral-400 block font-sans">Fatima Bibi</span>
-                      </div>
-                      <span className="px-2.5 py-1 rounded text-[10px] bg-amber-500/20 text-amber-400 font-bold uppercase tracking-wider border border-amber-500/30">
-                        Next in Line
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-red-950/30 border border-red-500/30 animate-pulse">
-                      <div>
-                        <span className="font-bold text-red-400 text-sm">TOKEN #06</span>
-                        <span className="text-[11px] text-neutral-400 block font-sans">Zubair Ahmed</span>
-                      </div>
-                      <span className="px-2.5 py-1 rounded text-[10px] bg-red-500 text-white font-bold uppercase tracking-wider">
-                        EMERGENCY
-                      </span>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Consultation & Rx Column */}
-                <div className="rounded-xl border border-white/[0.08] bg-[#0E131A] p-5 space-y-4">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-                    <span className="font-bold text-white text-sm">Doctor Consultation</span>
-                    <span className="text-[10px] text-neutral-400">Dr. Tariq Mahmood</span>
-                  </div>
-                  <div className="p-3.5 rounded-lg bg-black/50 border border-white/[0.06] space-y-2">
-                    <span className="text-[10px] uppercase tracking-wider text-neutral-400 block">Clinical Diagnosis</span>
-                    <span className="font-semibold text-white text-xs block">Essential Hypertension & Angina Pectoris</span>
-                    <div className="pt-2 flex flex-wrap gap-1.5">
-                      <span className="px-2 py-0.5 bg-white/[0.08] rounded text-[10px] text-neutral-200">Panadol 500mg (1-1-1)</span>
-                      <span className="px-2 py-0.5 bg-white/[0.08] rounded text-[10px] text-neutral-200">Norvasc 5mg (0-1-0)</span>
-                      <span className="px-2 py-0.5 bg-white/[0.08] rounded text-[10px] text-neutral-200">Risek 40mg (1-0-0)</span>
+                    <div className="p-5 pt-0">
+                      <Link
+                        href={`/appointments?departmentId=${dept.id}`}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0B4F8A] dark:text-[#64B5F6] group-hover:underline"
+                      >
+                        <span>View Doctors & Book</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
                     </div>
                   </div>
-                  <div className="pt-2">
-                    <div className="btn-pill w-full bg-[#EDE8E0] hover:bg-white text-black text-center text-xs font-bold transition-all">
-                      Print A4 Letterhead Rx
-                    </div>
-                  </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        {/* 4. "The Pain" Section with 3 Stat Blocks */}
-        <section id="the-pain" className="py-28 md:py-36 border-t border-white/[0.08] bg-[#06090D]">
+        {/* 6. Doctors Section (Grid + Department Filter) */}
+        <section id="doctors" className="py-20 bg-white dark:bg-[#162638] border-b border-[#E3E9EF] dark:border-[#23374D]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-red-400 block mb-3">
-                  The Problem
-                </span>
-                <h2 className="section-headline text-white tracking-tight leading-tight">
-                  Traditional hospital reception quietly burns patient trust
-                </h2>
-                <p className="mt-6 text-base text-[#9A958C] leading-relaxed">
-                  Scattered paper notebooks, unorganized walk-ins crowding doctor doorways, and zero live communication between reception and consultants result in chaotic patient waiting rooms.
-                </p>
-                <div className="mt-8 flex items-center gap-6 text-xs font-semibold text-neutral-300">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>Eliminates Paper Token Books</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>Zero Walk-in Bottlenecks</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3 Giant Metric Stat Blocks */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <div className="rounded-2xl border border-white/[0.08] bg-[#0A0D12] p-8 text-center hover:border-red-500/40 transition-colors">
-                  <span className="font-display font-black text-5xl md:text-6xl text-red-400 block mb-3">
-                    30+<span className="text-xl font-medium text-red-300 ml-1">m</span>
-                  </span>
-                  <span className="text-xs text-[#9A958C] leading-snug block font-medium">
-                    Average manual registration and handwritten paper slip wait
-                  </span>
-                </div>
-
-                <div className="rounded-2xl border border-white/[0.08] bg-[#0A0D12] p-8 text-center hover:border-amber-500/40 transition-colors">
-                  <span className="font-display font-black text-5xl md:text-6xl text-amber-400 block mb-3">
-                    5+
-                  </span>
-                  <span className="text-xs text-[#9A958C] leading-snug block font-medium">
-                    Disconnected paper registers and manual receipts per patient
-                  </span>
-                </div>
-
-                <div className="rounded-2xl border border-white/[0.08] bg-[#0A0D12] p-8 text-center hover:border-teal-500/40 transition-colors">
-                  <span className="font-display font-black text-5xl md:text-6xl text-teal-400 block mb-3">
-                    0
-                  </span>
-                  <span className="text-xs text-[#9A958C] leading-snug block font-medium">
-                    Real-time visibility into doctor queues and daily cash closing
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 5. "The Shift" Numbered 01 / 02 / 03 Cards */}
-        <section id="the-shift" className="py-28 md:py-36 border-t border-white/[0.08] bg-[#050505]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-20">
-              <span className="text-xs font-bold uppercase tracking-widest text-teal-400 block mb-3">
-                The Shift
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#1E9E8F] block mb-2">
+                Medical Team
               </span>
-              <h2 className="section-headline text-white tracking-tight">
-                From reception chaos to high-speed digital clinical operations
+              <h2 className="text-3xl sm:text-4xl font-bold font-heading text-[#0B4F8A] dark:text-white">
+                Our Senior Consultants
               </h2>
-              <p className="mt-4 text-[#9A958C] text-sm sm:text-base">
-                Engineered specifically for Pakistani hospitals with CNIC validation, multi-lingual support, and instant thermal printing.
+              <p className="mt-3 text-sm text-[#5B6B7B] dark:text-[#94A7BA]">
+                Consult with verified specialists across outpatient departments in Lahore.
+              </p>
+            </div>
+
+            {/* Interactive Doctors Filter Component */}
+            <DoctorsSection doctors={doctors as any} departments={departments} />
+          </div>
+        </section>
+
+        {/* 7. How It Works / Patient Journey (3 Steps) */}
+        <section className="py-20 bg-[#F6F9FC] dark:bg-[#0F1B2A] border-b border-[#E3E9EF] dark:border-[#23374D]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#1E9E8F] block mb-2">
+                Simple Process
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-bold font-heading text-[#0B4F8A] dark:text-white">
+                How It Works
+              </h2>
+              <p className="mt-3 text-sm text-[#5B6B7B] dark:text-[#94A7BA]">
+                A clear, organized outpatient journey from registration to doctor consultation.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Card 01 */}
-              <div className="relative rounded-2xl border border-white/[0.08] bg-[#0A0D12] p-8 md:p-10 hover:border-teal-500/40 transition-all group flex flex-col justify-between">
-                <div>
-                  <span className="font-display font-black text-6xl text-teal-500/20 group-hover:text-teal-400/80 transition-colors block mb-6">
-                    01
-                  </span>
-                  <h3 className="font-display font-bold text-xl text-white mb-3">
-                    Fast Patient Entry in 30 Seconds
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#9A958C] leading-relaxed">
-                    Keyboard-first intake with F2/F4 shortcuts. Automatic Pakistani CNIC and mobile verification, duplicate warning with one-click existing patient lookup, and auto NIH-MR number.
-                  </p>
+              {/* Step 1 */}
+              <div className="hospital-card p-6 text-center space-y-4">
+                <div className="w-14 h-14 rounded-xl bg-[#E8F1F9] text-[#0B4F8A] font-heading font-bold text-xl flex items-center justify-center mx-auto">
+                  01
                 </div>
-                <div className="mt-8 pt-4 border-t border-white/[0.06] flex items-center gap-2 text-xs font-semibold text-teal-400">
-                  <span>Instant Thermal Token</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </div>
+                <h3 className="text-lg font-bold text-[#1B2733] dark:text-[#E6EEF5] font-heading">
+                  Book Online or Walk In
+                </h3>
+                <p className="text-xs sm:text-sm text-[#5B6B7B] dark:text-[#94A7BA] leading-relaxed">
+                  Select your specialist, date, and preferred time slot online from your phone, or visit our reception desk on Jail Road.
+                </p>
               </div>
 
-              {/* Card 02 */}
-              <div className="relative rounded-2xl border border-white/[0.08] bg-[#0A0D12] p-8 md:p-10 hover:border-blue-500/40 transition-all group flex flex-col justify-between">
-                <div>
-                  <span className="font-display font-black text-6xl text-blue-500/20 group-hover:text-blue-400/80 transition-colors block mb-6">
-                    02
-                  </span>
-                  <h3 className="font-display font-bold text-xl text-white mb-3">
-                    Live Queue & Full-Screen TV Display
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#9A958C] leading-relaxed">
-                    Doctor calls next patient with one click. Instant Server-Sent Events update the waiting room TV screen (/display) with audio chime callouts, token numbers, and doctor room directions.
-                  </p>
+              {/* Step 2 */}
+              <div className="hospital-card p-6 text-center space-y-4">
+                <div className="w-14 h-14 rounded-xl bg-[#E6F5F3] text-[#1E9E8F] font-heading font-bold text-xl flex items-center justify-center mx-auto">
+                  02
                 </div>
-                <div className="mt-8 pt-4 border-t border-white/[0.06] flex items-center gap-2 text-xs font-semibold text-blue-400">
-                  <span>Sub-second SSE Sync</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </div>
+                <h3 className="text-lg font-bold text-[#1B2733] dark:text-[#E6EEF5] font-heading">
+                  Check In & Collect Token
+                </h3>
+                <p className="text-xs sm:text-sm text-[#5B6B7B] dark:text-[#94A7BA] leading-relaxed">
+                  Provide your CNIC or mobile number for instant verification. Receive your official token slip and track live progress on waiting room TVs.
+                </p>
               </div>
 
-              {/* Card 03 */}
-              <div className="relative rounded-2xl border border-white/[0.08] bg-[#0A0D12] p-8 md:p-10 hover:border-teal-500/40 transition-all group flex flex-col justify-between">
-                <div>
-                  <span className="font-display font-black text-6xl text-teal-500/20 group-hover:text-teal-400/80 transition-colors block mb-6">
-                    03
-                  </span>
-                  <h3 className="font-display font-bold text-xl text-white mb-3">
-                    Online Booking & SMS Reminders
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#9A958C] leading-relaxed">
-                    Self-serve appointment booking with doctor schedule availability, rate limiting, honeypot spam protection, and instant SMS/WhatsApp confirmation dispatched to the patient.
-                  </p>
+              {/* Step 3 */}
+              <div className="hospital-card p-6 text-center space-y-4">
+                <div className="w-14 h-14 rounded-xl bg-[#E8F1F9] text-[#0B4F8A] font-heading font-bold text-xl flex items-center justify-center mx-auto">
+                  03
                 </div>
-                <div className="mt-8 pt-4 border-t border-white/[0.06] flex items-center gap-2 text-xs font-semibold text-teal-400">
-                  <span>Automated WhatsApp / SMS</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </div>
+                <h3 className="text-lg font-bold text-[#1B2733] dark:text-[#E6EEF5] font-heading">
+                  Consultation & Reports
+                </h3>
+                <p className="text-xs sm:text-sm text-[#5B6B7B] dark:text-[#94A7BA] leading-relaxed">
+                  Meet your consultant, complete examinations, collect your printed prescription, and receive follow-up guidance.
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 6. AI Operational Insight Cards */}
-        <section className="py-28 md:py-36 border-t border-white/[0.08] bg-[#06090D]">
+        {/* 8. Today's Queue Status / Queue Alerts */}
+        <section className="py-16 bg-white dark:bg-[#162638] border-b border-[#E3E9EF] dark:border-[#23374D]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
               <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-teal-400 block mb-3">
-                  Operational Intelligence
+                <span className="text-xs font-bold uppercase tracking-wider text-[#1E9E8F] block mb-1">
+                  OPD Floor Management
                 </span>
-                <h2 className="section-headline text-white tracking-tight">
-                  Rule-based AI OPD Insights
+                <h2 className="text-2xl sm:text-3xl font-bold font-heading text-[#0B4F8A] dark:text-white">
+                  Today&apos;s Queue Status
                 </h2>
-                <p className="mt-3 text-sm text-[#9A958C] max-w-xl">
-                  Live clinical operations data transformed into instant actionable recommendations to balance lobby wait times and consultant load.
-                </p>
               </div>
               <Link
-                href="/login"
-                className="mt-6 md:mt-0 text-xs font-bold uppercase tracking-wider text-teal-400 hover:text-teal-300 inline-flex items-center gap-2 group"
+                href="/display"
+                target="_blank"
+                className="btn-secondary text-xs py-2 px-4 inline-flex items-center gap-1.5"
               >
-                <span>View Full Admin Analytics Console</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <Tv className="w-3.5 h-3.5" />
+                <span>Open Full-Screen TV Display</span>
               </Link>
             </div>
 
-            <AiInsightCards isDarkTheme={true} />
+            <QueueAlertsCards />
           </div>
         </section>
 
-        {/* 7. Clinical Departments Grid */}
-        <section id="departments" className="py-28 md:py-36 border-t border-white/[0.08] bg-[#050505]">
+        {/* 9. Patient Testimonials (3 Cards, Initials Avatars) */}
+        <section className="py-20 bg-[#F6F9FC] dark:bg-[#0F1B2A] border-b border-[#E3E9EF] dark:border-[#23374D]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-20">
-              <span className="text-xs font-bold uppercase tracking-widest text-teal-400 block mb-3">
-                Specialized Services
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#1E9E8F] block mb-2">
+                Patient Stories
               </span>
-              <h2 className="section-headline text-white tracking-tight">
-                Center of Clinical Excellence
+              <h2 className="text-3xl sm:text-4xl font-bold font-heading text-[#0B4F8A] dark:text-white">
+                What Our Patients Say
               </h2>
-              <p className="mt-3 text-sm text-[#9A958C]">
-                10 specialized OPD departments equipped with senior faculty, diagnostic pathology, and modern clinical facilities in Lahore.
+              <p className="mt-3 text-sm text-[#5B6B7B] dark:text-[#94A7BA]">
+                Real feedback from patients and families cared for at Naseem Ijaz Hospital.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              {departments.map((dept) => (
-                <div
-                  key={dept.id}
-                  className="rounded-2xl border border-white/[0.08] bg-[#0A0D12] p-6 hover:border-teal-500/50 hover:bg-[#0E141C] transition-all group flex flex-col justify-between"
-                >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Testimonial 1 */}
+              <div className="hospital-card p-6 flex flex-col justify-between">
+                <p className="text-xs sm:text-sm text-[#5B6B7B] dark:text-[#94A7BA] leading-relaxed mb-6 italic">
+                  &ldquo;The reception process was remarkably fast. We were issued token 04 for Dr. Tariq Mahmood and seen right on schedule. The hospital is impeccably clean and orderly.&rdquo;
+                </p>
+                <div className="flex items-center gap-3 pt-4 border-t border-[#E3E9EF] dark:border-[#23374D]">
+                  <div className="w-10 h-10 rounded-full bg-[#0B4F8A] text-white font-bold text-xs flex items-center justify-center shrink-0">
+                    MA
+                  </div>
                   <div>
-                    <div className="w-12 h-12 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-teal-500 group-hover:text-black transition-all">
-                      {dept.code === "CARD" ? (
-                        <HeartPulse className="w-6 h-6" />
-                      ) : dept.code === "ORTH" ? (
-                        <Bone className="w-6 h-6" />
-                      ) : dept.code === "NEUR" ? (
-                        <Brain className="w-6 h-6" />
-                      ) : dept.code === "PED" ? (
-                        <Baby className="w-6 h-6" />
-                      ) : dept.code === "OPHT" ? (
-                        <Eye className="w-6 h-6" />
-                      ) : dept.code === "ENT" ? (
-                        <Ear className="w-6 h-6" />
-                      ) : (
-                        <Stethoscope className="w-6 h-6" />
-                      )}
-                    </div>
-                    <h4 className="font-bold text-base text-white group-hover:text-teal-300 transition-colors">{dept.name}</h4>
-                    {dept.nameUrdu && (
-                      <span className="text-xs text-teal-400/80 font-urdu block mb-2">
-                        {dept.nameUrdu}
-                      </span>
-                    )}
-                    <p className="text-xs text-[#9A958C] line-clamp-2 leading-relaxed">
-                      {dept.description || "Comprehensive outpatient evaluation and expert care."}
+                    <h4 className="text-sm font-bold text-[#1B2733] dark:text-[#E6EEF5]">
+                      Muhammad Asif
+                    </h4>
+                    <span className="text-xs text-[#5B6B7B] dark:text-[#94A7BA]">
+                      Cardiology Patient &bull; Gulberg Lahore
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 2 */}
+              <div className="hospital-card p-6 flex flex-col justify-between">
+                <p className="text-xs sm:text-sm text-[#5B6B7B] dark:text-[#94A7BA] leading-relaxed mb-6 italic">
+                  &ldquo;Dr. Sana Farooq was exceedingly thorough and kind. The nursing staff assisted us with care, and having the digital prescription sent via SMS made medication retrieval effortless.&rdquo;
+                </p>
+                <div className="flex items-center gap-3 pt-4 border-t border-[#E3E9EF] dark:border-[#23374D]">
+                  <div className="w-10 h-10 rounded-full bg-[#1E9E8F] text-white font-bold text-xs flex items-center justify-center shrink-0">
+                    SR
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-[#1B2733] dark:text-[#E6EEF5]">
+                      Sadia Riaz
+                    </h4>
+                    <span className="text-xs text-[#5B6B7B] dark:text-[#94A7BA]">
+                      Gynecology Clinic &bull; Model Town Lahore
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 3 */}
+              <div className="hospital-card p-6 flex flex-col justify-between">
+                <p className="text-xs sm:text-sm text-[#5B6B7B] dark:text-[#94A7BA] leading-relaxed mb-6 italic">
+                  &ldquo;Having the live TV display board in the waiting lounge kept everything calm and transparent. No confusion about whose turn was next. A standard every hospital in Pakistan should follow.&rdquo;
+                </p>
+                <div className="flex items-center gap-3 pt-4 border-t border-[#E3E9EF] dark:border-[#23374D]">
+                  <div className="w-10 h-10 rounded-full bg-[#0B4F8A] text-white font-bold text-xs flex items-center justify-center shrink-0">
+                    KH
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-[#1B2733] dark:text-[#E6EEF5]">
+                      Kamran Hafeez
+                    </h4>
+                    <span className="text-xs text-[#5B6B7B] dark:text-[#94A7BA]">
+                      Pediatrics OPD &bull; DHA Lahore
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 10. Appointment Booking Section (Working Form on White Card over Light Blue Band) */}
+        <section id="appointments" className="py-20 bg-[#E8F1F9] dark:bg-[#111F30] border-b border-[#E3E9EF] dark:border-[#23374D]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+              {/* Left Column: Guidance & Info */}
+              <div className="lg:col-span-5 space-y-6">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#0B4F8A] dark:text-[#64B5F6] block">
+                  Online Appointments
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-bold font-heading text-[#0B4F8A] dark:text-white leading-tight">
+                  Schedule Your Consultation
+                </h2>
+                <p className="text-sm text-[#5B6B7B] dark:text-[#94A7BA] leading-relaxed">
+                  Reserve your appointment slot online in less than a minute. You will receive an immediate SMS confirmation with your reference number.
+                </p>
+
+                {/* Banner Photo */}
+                <div className="relative rounded-xl overflow-hidden border border-[#E3E9EF] dark:border-[#23374D] aspect-[16/9] shadow-sm bg-white">
+                  <Image
+                    src="/images/appointment-banner.webp"
+                    alt="Doctor Appointment Consultation"
+                    fill
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="object-cover"
+                  />
+                </div>
+
+                <div className="hospital-card p-4 bg-white dark:bg-[#162638] space-y-2">
+                  <div className="text-xs font-bold text-[#0B4F8A] dark:text-[#64B5F6]">
+                    Appointment Guidelines:
+                  </div>
+                  <ul className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] space-y-1.5 list-disc list-inside">
+                    <li>Please arrive 15 minutes prior to your allocated slot for token check-in.</li>
+                    <li>Consultation fee is payable directly at the hospital reception desk.</li>
+                    <li>Need urgent assistance? Call our helpline at +92 42 3578 9000.</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Right Column: Working Appointment Form */}
+              <div className="lg:col-span-7">
+                <div className="hospital-card p-6 sm:p-8 bg-white dark:bg-[#162638] shadow-md">
+                  <div className="border-b border-[#E3E9EF] dark:border-[#23374D] pb-4 mb-6">
+                    <h3 className="text-lg font-bold text-[#0B4F8A] dark:text-white font-heading">
+                      Book Doctor Consultation
+                    </h3>
+                    <p className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-1">
+                      Fill in your details below to secure your consultation appointment.
                     </p>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
-        {/* 8. Doctors Grid */}
-        <section id="doctors" className="py-28 md:py-36 border-t border-white/[0.08] bg-[#06090D]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-20">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-teal-400 block mb-3">
-                  Medical Specialists
-                </span>
-                <h2 className="section-headline text-white tracking-tight">
-                  Consultant Physicians & Surgeons
-                </h2>
-                <p className="mt-3 text-sm text-[#9A958C]">
-                  Book consultation appointments with Lahore’s most senior medical faculty.
-                </p>
+                  <PublicBookingForm departments={departments} doctors={doctors as any} />
+                </div>
               </div>
-              <Link
-                href="/appointments"
-                className="btn-pill bg-teal-500 hover:bg-teal-400 text-black text-xs font-bold tracking-wider uppercase mt-6 md:mt-0 shadow-glow-teal"
-              >
-                Schedule Appointment Online
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {doctors.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="rounded-2xl border border-white/[0.08] bg-[#0A0D12] p-6 hover:border-teal-500/40 hover:bg-[#0E141C] transition-all flex flex-col justify-between group"
-                >
-                  <div>
-                    {/* Doctor avatar initials with gradient ring */}
-                    <div className="w-16 h-16 rounded-2xl p-0.5 bg-gradient-to-tr from-teal-400 via-teal-600 to-blue-500 mb-5 group-hover:scale-105 transition-transform">
-                      <div className="w-full h-full rounded-[14px] bg-[#0B0F14] flex items-center justify-center text-teal-300 font-display font-extrabold text-xl">
-                        {doc.name.replace("Dr. ", "").charAt(0)}
-                      </div>
-                    </div>
-
-                    <h3 className="font-bold text-lg text-white group-hover:text-teal-300 transition-colors">{doc.name}</h3>
-                    {doc.nameUrdu && (
-                      <span className="text-xs text-teal-400 font-urdu block mb-1">
-                        {doc.nameUrdu}
-                      </span>
-                    )}
-                    <span className="text-xs font-semibold text-teal-400 block">
-                      {doc.specialty}
-                    </span>
-                    <span className="text-[11px] text-[#9A958C] block mt-1">
-                      {doc.qualification}
-                    </span>
-
-                    <div className="mt-5 pt-4 border-t border-white/[0.06] space-y-2 text-xs text-[#9A958C]">
-                      <div className="flex justify-between">
-                        <span>OPD Room:</span>
-                        <span className="text-white font-semibold">{doc.roomNo}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Consultation Fee:</span>
-                        <span className="text-teal-300 font-bold">{formatPKR(doc.fee)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Clinic Hours:</span>
-                        <span className="text-neutral-300">09:00 AM - 03:00 PM</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 pt-4 border-t border-white/[0.06]">
-                    <Link
-                      href={`/appointments?doctorId=${doc.id}`}
-                      className="btn-pill w-full bg-white/10 hover:bg-teal-500 hover:text-black text-white text-center text-xs font-bold transition-all"
-                    >
-                      Book Appointment
-                    </Link>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>
 
-        {/* 9. Interactive Online Appointment Booking Form */}
-        <section id="book" className="py-28 md:py-36 border-t border-white/[0.08] bg-[#050505]">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <span className="text-xs font-bold uppercase tracking-widest text-teal-400 block mb-3">
-                Online Patient Portal
+        {/* 11. Contact & Emergency Section */}
+        <section id="contact" className="py-20 bg-white dark:bg-[#162638]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#1E9E8F] block mb-2">
+                Hospital Campus
               </span>
-              <h2 className="section-headline text-white tracking-tight">
-                Book Your Doctor Consultation
+              <h2 className="text-3xl sm:text-4xl font-bold font-heading text-[#0B4F8A] dark:text-white">
+                Contact & Location
               </h2>
-              <p className="mt-4 text-sm sm:text-base text-[#9A958C]">
-                Select your department, doctor, and preferred appointment slot. Receive instant SMS confirmation.
+              <p className="mt-3 text-sm text-[#5B6B7B] dark:text-[#94A7BA]">
+                Located conveniently on Jail Road, Lahore with 24-hour emergency response and ambulance services.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/[0.08] bg-[#0A0D12] p-8 sm:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
-              <PublicBookingForm
-                departments={departments}
-                doctors={doctors}
-              />
-            </div>
-          </div>
-        </section>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+              {/* Left Column: Campus Details + Emergency Red Box + Static Map */}
+              <div className="lg:col-span-6 space-y-6">
+                {/* 24/7 Emergency Box */}
+                <div className="p-5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 flex items-start justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" />
+                      <h4 className="text-sm font-bold text-red-700 dark:text-red-400 font-heading">
+                        24/7 Emergency & Ambulance Service
+                      </h4>
+                    </div>
+                    <p className="text-xs text-red-600/90 dark:text-red-300">
+                      Immediate trauma, cardiac, and pediatric emergency care team on round-the-clock duty.
+                    </p>
+                  </div>
+                  <a
+                    href="tel:+924235789999"
+                    className="btn-danger text-xs px-3.5 py-2 shrink-0 flex items-center gap-1.5"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>Call ER</span>
+                  </a>
+                </div>
 
-        {/* 10. Contact Section */}
-        <section id="contact" className="py-28 md:py-36 border-t border-white/[0.08] bg-[#06090D]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-teal-400 block mb-3">
-                  Get In Touch
-                </span>
-                <h2 className="section-headline text-white tracking-tight leading-tight">
-                  Hospital Information & 24/7 Emergency Helpline
-                </h2>
-                <p className="mt-6 text-sm sm:text-base text-[#9A958C] leading-relaxed">
-                  Located in Lahore, Pakistan, Naseem Ijaz Hospital offers compassionate outpatient and inpatient care with 24/7 trauma response, modular operation theaters, and an advanced cardiac ICU.
-                </p>
-
-                <div className="mt-10 space-y-4">
-                  <div className="flex items-start gap-4 p-5 rounded-xl border border-white/[0.08] bg-[#0A0D12]">
-                    <MapPin className="w-5 h-5 text-teal-400 shrink-0 mt-0.5" />
+                {/* Campus Information Grid */}
+                <div className="hospital-card p-5 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-[#0B4F8A] shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-xs font-bold text-white block">Main Medical Campus</span>
-                      <span className="text-xs text-[#9A958C] mt-1 block">
-                        {profile?.address || "Plot 14-B, Medical Enclave, Jail Road, Lahore, Pakistan"}
-                      </span>
+                      <div className="text-xs font-bold text-[#1B2733] dark:text-[#E6EEF5]">
+                        Hospital Campus Address
+                      </div>
+                      <div className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-0.5">
+                        Plot 14-B, Medical Enclave, Jail Road, Lahore, Pakistan
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-4 p-5 rounded-xl border border-white/[0.08] bg-[#0A0D12]">
-                    <Phone className="w-5 h-5 text-teal-400 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-3 pt-3 border-t border-[#E3E9EF] dark:border-[#23374D]">
+                    <Phone className="w-5 h-5 text-[#1E9E8F] shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-xs font-bold text-white block">OPD Appointments Helpline</span>
-                      <span className="text-xs text-[#9A958C] mt-1 block font-mono">
-                        {profile?.phone || "+92 42 3578 9000"} (08:00 AM - 10:00 PM)
-                      </span>
+                      <div className="text-xs font-bold text-[#1B2733] dark:text-[#E6EEF5]">
+                        Telephone & Helpline
+                      </div>
+                      <div className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-0.5">
+                        General: +92 42 3578 9000 &bull; Emergency: +92 42 3578 9999
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-4 p-5 rounded-xl border border-red-500/30 bg-red-950/20 shadow-glow-teal/10">
-                    <HeartPulse className="w-5 h-5 text-red-400 shrink-0 mt-0.5 animate-pulse" />
+                  <div className="flex items-start gap-3 pt-3 border-t border-[#E3E9EF] dark:border-[#23374D]">
+                    <Mail className="w-5 h-5 text-[#0B4F8A] shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-xs font-bold text-red-300 block">Emergency & Ambulance Direct</span>
-                      <span className="text-xs text-red-200 mt-1 block font-mono font-bold">
-                        {profile?.emergencyPhone || "+92 42 3578 9999"} (24/7 Dedicated Line)
-                      </span>
+                      <div className="text-xs font-bold text-[#1B2733] dark:text-[#E6EEF5]">
+                        Email Communication
+                      </div>
+                      <div className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-0.5">
+                        info@naseemijazhospital.pk
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Static Stylized Map */}
+                <div className="relative rounded-xl overflow-hidden border border-[#E3E9EF] dark:border-[#23374D] aspect-[16/9] shadow-sm bg-[#EBF2F7]">
+                  <Image
+                    src="/images/hospital-map.svg"
+                    alt="Naseem Ijaz Hospital Location Map - Jail Road Lahore"
+                    fill
+                    loading="lazy"
+                    className="object-cover"
+                  />
+                </div>
               </div>
 
-              {/* Contact Form Component */}
-              <div className="rounded-2xl border border-white/[0.08] bg-[#0A0D12] p-8 sm:p-10 shadow-2xl">
-                <h3 className="font-display font-bold text-xl text-white mb-2">Send us an Inquiry</h3>
-                <p className="text-xs text-[#9A958C] mb-8">
-                  Fill out the form below. Your query will be delivered directly to hospital administration.
-                </p>
-                <PublicContactForm />
+              {/* Right Column: Contact Inquiry Form */}
+              <div className="lg:col-span-6">
+                <div className="hospital-card p-6 sm:p-8 bg-[#F6F9FC] dark:bg-[#111B27]">
+                  <div className="border-b border-[#E3E9EF] dark:border-[#23374D] pb-3 mb-5">
+                    <h3 className="text-base font-bold text-[#0B4F8A] dark:text-white font-heading">
+                      Send a Message to Patient Services
+                    </h3>
+                    <p className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-1">
+                      Our patient coordination desk will answer your query promptly.
+                    </p>
+                  </div>
+
+                  <PublicContactForm />
+                </div>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* 11. Footer */}
+      {/* 12. Footer */}
       <Footer />
     </div>
   );

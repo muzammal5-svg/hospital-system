@@ -33,123 +33,125 @@ export default function PatientsClient({ initialPatients, userRole }: PatientsCl
 
   return (
     <div className="space-y-6">
-      {/* Patient Detail Drawer / Modal */}
+      {/* Patient Detail Modal */}
       {selectedPatient && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 text-xs">
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-white/10">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white dark:bg-[#162638] border border-[#E3E9EF] dark:border-[#23374D] rounded-xl max-w-xl w-full p-6 shadow-xl space-y-4 text-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E3E9EF] dark:border-[#23374D]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-teal-500 text-black font-bold flex items-center justify-center text-sm">
+                <div className="w-10 h-10 rounded-lg bg-[#0B4F8A] text-white font-bold flex items-center justify-center text-sm">
                   {selectedPatient.fullName.charAt(0)}
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-neutral-900 dark:text-white">
+                  <h3 className="font-bold text-sm text-[#1B2733] dark:text-white font-heading">
                     {selectedPatient.fullName}
                   </h3>
-                  <span className="font-mono text-teal-600 dark:text-teal-400 font-bold">
+                  <span className="font-mono text-[#0B4F8A] dark:text-[#64B5F6] font-bold">
                     {selectedPatient.mrNumber}
                   </span>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedPatient(null)}
-                className="p-1 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
+                className="p-1 rounded-md text-[#5B6B7B] hover:text-[#1B2733] dark:hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Vitals & Demographics */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 bg-neutral-50 dark:bg-white/5 rounded-xl">
+            {/* Demographics Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3.5 bg-[#F6F9FC] dark:bg-[#111B27] rounded-lg border border-[#E3E9EF] dark:border-[#23374D]">
               <div>
-                <span className="text-neutral-400 block text-[10px]">Father / Husband</span>
-                <span className="font-semibold text-neutral-800 dark:text-neutral-200">{selectedPatient.fatherOrHusbandName || "—"}</span>
+                <span className="text-[#8A97A5] block text-[10px]">Father / Husband</span>
+                <span className="font-semibold text-[#1B2733] dark:text-white">{selectedPatient.fatherOrHusbandName || "—"}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[10px]">Age / Gender</span>
-                <span className="font-semibold text-neutral-800 dark:text-neutral-200">{selectedPatient.age || "—"} Yrs / {selectedPatient.gender}</span>
+                <span className="text-[#8A97A5] block text-[10px]">Age / Gender</span>
+                <span className="font-semibold text-[#1B2733] dark:text-white">{selectedPatient.age || "—"} Yrs / {selectedPatient.gender}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[10px]">Mobile</span>
-                <span className="font-mono font-semibold text-neutral-800 dark:text-neutral-200">{selectedPatient.mobile}</span>
+                <span className="text-[#8A97A5] block text-[10px]">Mobile</span>
+                <span className="font-mono font-semibold text-[#1B2733] dark:text-white">{selectedPatient.mobile}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[10px]">CNIC ({userRole === "ADMIN" ? "Unmasked" : "Masked"})</span>
-                <span className="font-mono font-semibold text-neutral-800 dark:text-neutral-200">{selectedPatient.cnic || "—"}</span>
+                <span className="text-[#8A97A5] block text-[10px]">CNIC ({userRole === "ADMIN" ? "Unmasked" : "Masked"})</span>
+                <span className="font-mono font-semibold text-[#1B2733] dark:text-white">{selectedPatient.cnic || "—"}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[10px]">Blood Group</span>
-                <span className="font-semibold text-neutral-800 dark:text-neutral-200">{selectedPatient.bloodGroup || "—"}</span>
+                <span className="text-[#8A97A5] block text-[10px]">Blood Group</span>
+                <span className="font-semibold text-[#1B2733] dark:text-white">{selectedPatient.bloodGroup || "—"}</span>
               </div>
               <div>
-                <span className="text-neutral-400 block text-[10px]">City</span>
-                <span className="font-semibold text-neutral-800 dark:text-neutral-200">{selectedPatient.city}</span>
+                <span className="text-[#8A97A5] block text-[10px]">City</span>
+                <span className="font-semibold text-[#1B2733] dark:text-white">{selectedPatient.city}</span>
               </div>
             </div>
 
             {/* Allergies Notice */}
             {selectedPatient.allergies && (
-              <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-xl flex items-center gap-2 text-red-600 dark:text-red-400">
-                <ShieldAlert className="w-4 h-4 shrink-0" />
+              <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40 rounded-lg flex items-center gap-2 text-red-600 dark:text-red-400">
+                <ShieldAlert className="w-4 h-4 shrink-0 text-red-600" />
                 <span>Known Allergies: <strong>{selectedPatient.allergies}</strong></span>
               </div>
             )}
 
-            {/* Visit History */}
+            {/* Recent Visits */}
             <div>
-              <span className="font-bold text-neutral-700 dark:text-neutral-300 block mb-2">
-                Recent OPD Visits ({selectedPatient.visits?.length || 0})
+              <span className="font-bold text-[#1B2733] dark:text-white block mb-2 font-heading">
+                Recent Hospital Visits
               </span>
-              {selectedPatient.visits && selectedPatient.visits.length > 0 ? (
-                <div className="space-y-1.5 max-h-40 overflow-y-auto">
-                  {selectedPatient.visits.map((v: any) => (
-                    <div key={v.id} className="p-2.5 rounded-lg bg-neutral-100 dark:bg-white/5 flex justify-between items-center">
+              <div className="space-y-1.5">
+                {selectedPatient.visits && selectedPatient.visits.length > 0 ? (
+                  selectedPatient.visits.map((v: any) => (
+                    <div
+                      key={v.id}
+                      className="p-2.5 rounded-lg bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] flex items-center justify-between"
+                    >
                       <div>
-                        <span className="font-bold text-neutral-900 dark:text-white block">{v.doctor?.name}</span>
-                        <span className="text-[10px] text-neutral-500">{v.department?.name} • {formatDate(v.createdAt)}</span>
+                        <span className="font-bold text-[#1B2733] dark:text-white block">{v.doctor?.name} ({v.department?.name})</span>
+                        <span className="text-[10px] text-[#5B6B7B] dark:text-[#94A7BA]">{v.tokenDate} &bull; Token #{v.tokenNumber}</span>
                       </div>
-                      <span className="font-mono text-teal-600 dark:text-teal-400 font-bold">
-                        Token #{v.tokenNumber}
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E6F5F3] text-[#1E9E8F] border border-[#1E9E8F]/20">
+                        {v.status}
                       </span>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-3 text-neutral-400 text-center bg-neutral-50 dark:bg-white/5 rounded-lg">
-                  No prior OPD visits recorded.
-                </div>
-              )}
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-[#8A97A5]">No recorded prior visits.</div>
+                )}
+              </div>
             </div>
 
-            <div className="pt-2 flex justify-end gap-2">
+            {/* Action footer */}
+            <div className="pt-3 border-t border-[#E3E9EF] dark:border-[#23374D] flex justify-end gap-2">
               <button
                 onClick={() => {
-                  setSelectedPatient(null);
-                  router.push(`/dashboard/reception?action=new-visit`);
+                  router.push(`/dashboard/reception?action=new-visit&patientId=${selectedPatient.id}`);
                 }}
-                className="btn-pill bg-teal-500 text-black text-xs font-bold"
+                className="btn-primary text-xs py-2 px-4"
               >
-                Issue New Token
+                <CalendarPlus className="w-3.5 h-3.5" />
+                <span>Issue New OPD Token</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Header and Search Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Top Header & Search Bar */}
+      <div className="hospital-card p-5 bg-white dark:bg-[#162638] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-display font-extrabold text-2xl tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold font-heading text-[#0B4F8A] dark:text-white">
             Patients Master Directory
           </h1>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-            Search 50+ registered patients by Name, MR #, Phone or CNIC.
+          <p className="text-xs text-[#5B6B7B] dark:text-[#94A7BA] mt-0.5">
+            Centralized index of registered hospital patients with privacy masking.
           </p>
         </div>
 
         <button
           onClick={() => router.push("/dashboard/reception?action=new-patient")}
-          className="btn-pill bg-teal-500 hover:bg-teal-600 text-black text-xs font-bold flex items-center gap-2"
+          className="btn-primary text-xs py-2 px-4 shadow-sm"
         >
           <UserPlus className="w-4 h-4" />
           <span>New Patient (F2)</span>
@@ -157,74 +159,75 @@ export default function PatientsClient({ initialPatients, userRole }: PatientsCl
       </div>
 
       {/* Search Input */}
-      <div className="p-4 rounded-2xl bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 shadow-card-soft">
-        <form onSubmit={handleSearch} className="flex gap-2 text-xs">
-          <input
-            type="text"
-            placeholder="Search by Patient Name, MR Number, Mobile (03XX), or CNIC..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 bg-neutral-50 dark:bg-[#11171E] border border-neutral-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-neutral-900 dark:text-white outline-none focus:border-teal-500"
-          />
+      <div className="hospital-card p-4 bg-white dark:bg-[#162638]">
+        <form onSubmit={handleSearch} className="flex gap-2.5">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-[#8A97A5] absolute left-3.5 top-3.5" />
+            <input
+              type="text"
+              placeholder="Search by MR Number, Patient Name, Mobile or CNIC..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full bg-[#F6F9FC] dark:bg-[#111B27] border border-[#E3E9EF] dark:border-[#23374D] rounded-lg pl-10 pr-4 py-2.5 text-xs text-[#1B2733] dark:text-[#E6EEF5] outline-none focus:border-[#0B4F8A] h-11"
+            />
+          </div>
           <button
             type="submit"
             disabled={loading}
-            className="btn-pill bg-teal-500 text-black text-xs font-bold px-6"
+            className="btn-secondary text-xs px-6 font-bold h-11"
           >
-            {loading ? "Searching..." : "Search Records"}
+            {loading ? "Searching..." : "Search"}
           </button>
         </form>
       </div>
 
       {/* Patients Table */}
-      <div className="rounded-2xl bg-white dark:bg-[#0B0F14] border border-neutral-200 dark:border-white/10 shadow-card-soft overflow-hidden">
+      <div className="hospital-card bg-white dark:bg-[#162638] overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
+          <table className="w-full text-xs hospital-table text-left">
             <thead>
-              <tr className="border-b border-neutral-200 dark:border-white/10 text-neutral-400 bg-neutral-50 dark:bg-white/5">
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">MR Number</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">Patient Name</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">Age / Gender</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">Mobile</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">CNIC</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px]">City</th>
-                <th className="py-3 px-4 font-bold uppercase text-[10px] text-right">Actions</th>
+              <tr>
+                <th>MR Number</th>
+                <th>Full Name</th>
+                <th>Age / Gender</th>
+                <th>Mobile</th>
+                <th>CNIC ({userRole === "ADMIN" ? "Full" : "Masked"})</th>
+                <th>City</th>
+                <th>Registered</th>
+                <th className="text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 dark:divide-white/5">
+            <tbody>
               {patients.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-neutral-400">
-                    No matching patients found.
+                  <td colSpan={8} className="py-12 text-center text-[#8A97A5]">
+                    No patient records found matching your query.
                   </td>
                 </tr>
               ) : (
                 patients.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                    onClick={() => setSelectedPatient(p)}
-                  >
-                    <td className="py-3 px-4 font-mono font-bold text-teal-600 dark:text-teal-400">
-                      {p.mrNumber}
+                  <tr key={p.id}>
+                    <td>
+                      <span className="font-mono font-bold text-[#0B4F8A] dark:text-[#64B5F6] bg-[#E8F1F9] dark:bg-[#1E3147] px-2 py-1 rounded">
+                        {p.mrNumber}
+                      </span>
                     </td>
-                    <td className="py-3 px-4 font-bold text-neutral-900 dark:text-white">
+                    <td className="font-semibold text-[#1B2733] dark:text-white">
                       {p.fullName}
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="text-[#5B6B7B] dark:text-[#94A7BA]">
                       {p.age || "—"} Yrs / {p.gender}
                     </td>
-                    <td className="py-3 px-4 font-mono">{p.mobile}</td>
-                    <td className="py-3 px-4 font-mono">
-                      {p.cnic || "—"}
-                    </td>
-                    <td className="py-3 px-4">{p.city}</td>
-                    <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                    <td className="font-mono">{p.mobile}</td>
+                    <td className="font-mono text-[#5B6B7B] dark:text-[#94A7BA]">{p.cnic || "—"}</td>
+                    <td>{p.city}</td>
+                    <td className="text-[#5B6B7B] dark:text-[#94A7BA]">{formatDate(p.createdAt)}</td>
+                    <td className="text-right">
                       <button
                         onClick={() => setSelectedPatient(p)}
-                        className="px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/10 hover:bg-teal-500 hover:text-black font-semibold text-xs transition-colors"
+                        className="btn-secondary text-[11px] py-1 px-3"
                       >
-                        View Profile
+                        Details &rarr;
                       </button>
                     </td>
                   </tr>

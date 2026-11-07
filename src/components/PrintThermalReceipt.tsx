@@ -50,24 +50,24 @@ export function PrintThermalReceipt({ visit, hospitalProfile, onClose }: Thermal
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+      <div className="bg-white border border-[#E3E9EF] rounded-xl p-6 max-w-sm w-full shadow-2xl">
         {/* Controls (hidden during print) */}
-        <div className="no-print flex items-center justify-between pb-4 border-b border-neutral-200 dark:border-neutral-800 mb-4">
-          <div className="flex items-center gap-2 text-sm font-bold text-neutral-800 dark:text-neutral-100">
-            <Printer className="w-4 h-4 text-teal-500" />
-            <span>80mm Thermal Slip</span>
+        <div className="no-print flex items-center justify-between pb-4 border-b border-[#E3E9EF] mb-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#1B2733]">
+            <Printer className="w-4 h-4 text-[#0B4F8A]" />
+            <span>80mm Thermal Receipt</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="px-3 py-1.5 rounded-full bg-teal-500 hover:bg-teal-600 text-black text-xs font-bold transition-colors"
+              className="px-3.5 py-1.5 rounded-lg bg-[#0B4F8A] hover:bg-[#093F6E] text-white text-xs font-semibold transition-colors shadow-sm"
             >
               Print Slip (Ctrl+P)
             </button>
             {onClose && (
               <button
                 onClick={onClose}
-                className="p-1 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
+                className="p-1 rounded-lg text-[#8A97A5] hover:text-[#1B2733] hover:bg-[#F6F9FC]"
               >
                 <X className="w-4 h-4" />
               </button>

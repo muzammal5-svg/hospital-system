@@ -4,3 +4,4 @@ dev.db*
 backups/*.json
 .env*.local
 *.log
+*.tsbuildinfo

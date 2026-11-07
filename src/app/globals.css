@@ -4,151 +4,228 @@
 
 @layer base {
   :root {
-    --background: 200 20% 98%;
-    --foreground: 205 55% 10%;
+    /* Background #F6F9FC */
+    --background: 210 33% 98%;
+    /* Text Primary #1B2733 */
+    --foreground: 211 31% 15%;
 
+    /* Surface / Card #FFFFFF */
     --card: 0 0% 100%;
-    --card-foreground: 205 55% 10%;
+    --card-foreground: 211 31% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 205 55% 10%;
+    --popover-foreground: 211 31% 15%;
 
-    /* Hospital Teal #0EA5A4 */
-    --primary: 179 84% 35%;
+    /* Hospital Navy #0B4F8A */
+    --primary: 209 85% 29%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 204 25% 94%;
-    --secondary-foreground: 205 55% 15%;
+    /* Healing Teal #1E9E8F */
+    --secondary: 173 68% 37%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 20% 95%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 210 20% 96%;
+    /* Text Secondary #5B6B7B */
+    --muted-foreground: 210 15% 42%;
 
-    --accent: 179 84% 94%;
-    --accent-foreground: 179 84% 25%;
+    /* Navy Light Tint #E8F1F9 */
+    --accent: 208 60% 95%;
+    --accent-foreground: 209 85% 29%;
 
-    --destructive: 0 84% 60%;
+    /* Danger #D64545 */
+    --destructive: 0 65% 56%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 179 84% 35%;
+    /* Border #E3E9EF */
+    --border: 210 25% 91%;
+    --input: 210 25% 91%;
+    --ring: 209 85% 29%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
   }
 
   .dark {
-    /* Kontrora Deep Black #050505 */
-    --background: 0 0% 2%;
-    --foreground: 36 24% 90%; /* #EDE8E0 Bone */
+    /* Proper Dark Navy #0F1B2A */
+    --background: 214 47% 11%;
+    --foreground: 208 43% 94%;
 
-    --card: 210 20% 6%; /* #0B0F14 */
-    --card-foreground: 36 24% 90%;
+    /* Surface #162638 */
+    --card: 214 43% 15%;
+    --card-foreground: 208 43% 94%;
 
-    --popover: 210 20% 6%;
-    --popover-foreground: 36 24% 90%;
+    --popover: 214 43% 15%;
+    --popover-foreground: 208 43% 94%;
 
-    --primary: 179 84% 42%;
+    --primary: 209 85% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 9%; /* #171717 */
-    --secondary-foreground: 36 24% 90%;
+    --secondary: 173 68% 42%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 0 0% 10%;
-    --muted-foreground: 36 7% 55%; /* #9A958C */
+    --muted: 214 38% 18%;
+    --muted-foreground: 210 20% 65%;
 
-    --accent: 179 84% 15%;
-    --accent-foreground: 179 84% 75%;
+    --accent: 214 38% 22%;
+    --accent-foreground: 208 43% 94%;
 
-    --destructive: 0 62% 30%;
+    --destructive: 0 65% 56%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 100% / 0.08;
-    --input: 0 0% 100% / 0.12;
-    --ring: 179 84% 42%;
+    /* Dark Border #23374D */
+    --border: 214 37% 22%;
+    --input: 214 37% 22%;
+    --ring: 209 85% 45%;
   }
 }
 
 /* Base Body */
 body {
-  font-family: var(--font-poppins), "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-poppins), "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-feature-settings: "rlig" 1, "calt" 1;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
 }
 
-/* Urdu Typography Tweaks */
+/* Headings font */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-poppins), "Poppins", sans-serif;
+  letter-spacing: -0.015em;
+  color: hsl(var(--foreground));
+}
+
+/* Urdu Typography */
 [dir="rtl"] {
+  font-family: var(--font-noto-urdu), "Noto Nastaliq Urdu", serif !important;
   letter-spacing: 0 !important;
-  line-height: 1.8 !important;
+  line-height: 1.85 !important;
 }
 
-/* Kontrora Pill Buttons */
+/* Hospital Clean Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #0B4F8A;
+  color: #FFFFFF;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-color: #093F6E;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #FFFFFF;
+  color: #0B4F8A;
+  border: 1px solid #0B4F8A;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  background-color: #E8F1F9;
+}
+
+.btn-teal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #1E9E8F;
+  color: #FFFFFF;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+.btn-teal:hover {
+  background-color: #167C70;
+}
+
+/* Backward compatibility for btn-pill -> mapped to clean 8px hospital button */
 .btn-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 9999px;
-  font-family: var(--font-poppins), "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-weight: 700;
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
   min-height: 44px;
-  padding: 0.65rem 1.75rem;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0.625rem 1.25rem;
+  transition: all 0.2s ease;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
 }
 
-.btn-pill:hover {
-  transform: translateY(-1px);
+/* Cards & Surfaces */
+.hospital-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E3E9EF;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
 }
 
-.btn-pill:active {
-  transform: translateY(1px) scale(0.98);
+.dark .hospital-card {
+  background-color: #162638;
+  border-color: #23374D;
 }
 
-/* Fluid Hero Display Typography */
-.hero-headline {
-  font-family: var(--font-poppins), "Poppins", sans-serif;
-  font-size: clamp(2.6rem, 6.8vw, 5.8rem);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  font-weight: 800;
+/* Table styles */
+.hospital-table th {
+  background-color: #F6F9FC;
+  color: #5B6B7B;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #E3E9EF;
 }
 
-/* Section Headings */
-.section-headline {
-  font-family: var(--font-poppins), "Poppins", sans-serif;
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  font-weight: 800;
+.dark .hospital-table th {
+  background-color: #162638;
+  color: #94A7BA;
+  border-bottom-color: #23374D;
 }
 
-/* Dark Surface & Glass Utilities */
-.glass-surface {
-  background: rgba(11, 15, 20, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(237, 232, 224, 0.1);
+.hospital-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid #E3E9EF;
+  color: #1B2733;
 }
 
-.glass-surface-hover:hover {
-  border-color: rgba(14, 165, 164, 0.4);
-  box-shadow: 0 10px 30px -10px rgba(14, 165, 164, 0.15);
+.dark .hospital-table td {
+  border-bottom-color: #23374D;
+  color: #E6EEF5;
 }
 
-/* Soft Glow Effects */
-.glow-teal {
-  box-shadow: 0 0 35px rgba(14, 165, 164, 0.35);
+.hospital-table tbody tr:hover {
+  background-color: #F8FAFC;
 }
 
-.glow-bone {
-  box-shadow: 0 0 25px rgba(237, 232, 224, 0.18);
+.dark .hospital-table tbody tr:hover {
+  background-color: #1E3147;
 }
 
 /* ==============================================================================

@@ -55,7 +55,7 @@ async function main() {
     depts[d.code] = dept;
   }
 
-  // 3. Doctors (8 Doctors)
+  // 3. Doctors (8 Doctors - 4 Male, 4 Female)
   console.log('Seeding 8 Doctors...');
   const doctorsData = [
     {
@@ -68,6 +68,7 @@ async function main() {
       roomNo: 'OPD-101',
       phone: '0300-4567891',
       email: 'tariq.cardio@naseemijaz.pk',
+      photoUrl: '/images/doctors/dr-tariq-mahmood.webp',
       bio: 'Over 18 years of clinical cardiology experience at leading tertiary care hospitals.',
     },
     {
@@ -80,6 +81,7 @@ async function main() {
       roomNo: 'OPD-102',
       phone: '0300-4567892',
       email: 'sana.gyn@naseemijaz.pk',
+      photoUrl: '/images/doctors/dr-sana-farooq.webp',
       bio: 'Expert in high-risk pregnancies, maternal care, and laparoscopic reproductive surgery.',
     },
     {
@@ -92,6 +94,7 @@ async function main() {
       roomNo: 'OPD-103',
       phone: '0300-4567893',
       email: 'ahmed.med@naseemijaz.pk',
+      photoUrl: '/images/doctors/dr-ahmed-bilal.webp',
       bio: 'Specialist in metabolic syndromes, chronic diabetes management, and geriatric care.',
     },
     {
@@ -104,6 +107,7 @@ async function main() {
       roomNo: 'OPD-104',
       phone: '0300-4567894',
       email: 'usman.ortho@naseemijaz.pk',
+      photoUrl: '/images/doctors/dr-usman-khalid.webp',
       bio: 'Specializes in joint arthroplasty, complex trauma, and sports ligament reconstruction.',
     },
     {
@@ -116,6 +120,7 @@ async function main() {
       roomNo: 'OPD-105',
       phone: '0300-4567895',
       email: 'fatima.ped@naseemijaz.pk',
+      photoUrl: '/images/doctors/dr-fatima-noor.webp',
       bio: 'Devoted to newborn intensive care, childhood developmental milestones, and nutrition.',
     },
     {
@@ -128,6 +133,7 @@ async function main() {
       roomNo: 'OPD-106',
       phone: '0300-4567896',
       email: 'kamran.surg@naseemijaz.pk',
+      photoUrl: '/images/doctors/dr-kamran-aslam.webp',
       bio: 'Leading laparoscopic surgeon with deep expertise in minimally invasive gallbladder and hernia procedures.',
     },
     {
@@ -140,18 +146,20 @@ async function main() {
       roomNo: 'OPD-107',
       phone: '0300-4567897',
       email: 'ayesha.neuro@naseemijaz.pk',
+      photoUrl: '/images/doctors/dr-ayesha-malik.webp',
       bio: 'Comprehensive management of epilepsy, migraine, neuropathy, stroke recovery, and tremor disorders.',
     },
     {
-      name: 'Dr. Zubair Shah',
-      nameUrdu: 'ڈاکٹر زبیر شاہ',
+      name: 'Dr. Zainab Shah',
+      nameUrdu: 'ڈاکٹر زینب شاہ',
       qualification: 'MBBS, FCPS (Dermatology)',
       specialty: 'Consultant Dermatologist & Aesthetician',
       deptCode: 'DERM',
       fee: 2000,
       roomNo: 'OPD-108',
       phone: '0300-4567898',
-      email: 'zubair.derm@naseemijaz.pk',
+      email: 'zainab.derm@naseemijaz.pk',
+      photoUrl: '/images/doctors/dr-zainab-shah.webp',
       bio: 'Specialist in dermatological pathology, clinical laser treatments, and chronic eczema.',
     },
   ];
@@ -171,6 +179,7 @@ async function main() {
             roomNo: doc.roomNo,
             phone: doc.phone,
             bio: doc.bio,
+            photoUrl: doc.photoUrl,
             departmentId: depts[doc.deptCode].id,
           },
         })
@@ -185,6 +194,7 @@ async function main() {
             phone: doc.phone,
             email: doc.email,
             bio: doc.bio,
+            photoUrl: doc.photoUrl,
             departmentId: depts[doc.deptCode].id,
           },
         });

@@ -21,6 +21,7 @@ COPY . .
 # Generate Prisma Client for PostgreSQL & build standalone bundle
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV BUILD_STANDALONE=true
 
 RUN npx prisma generate --schema=prisma/schema.postgresql.prisma
 RUN npm run build

@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Tv, Volume2, VolumeX, Maximize2, Minimize2, Activity, Bell, AlertTriangle } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { Volume2, VolumeX, Maximize2, Minimize2, Bell, AlertTriangle, Clock, ArrowLeft } from "lucide-react";
 
 export default function TvDisplayPage() {
   const [visits, setVisits] = useState<any[]>([]);
@@ -11,7 +13,7 @@ export default function TvDisplayPage() {
   const [currentTime, setCurrentTime] = useState("");
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  // Play hospital chime sound using Web Audio API (zero external mp3 dependency, always works)
+  // Dual tone hospital chime using Web Audio API
   const playChime = () => {
     if (!soundEnabled) return;
     try {
@@ -26,7 +28,7 @@ export default function TvDisplayPage() {
       }
 
       const now = ctx.currentTime;
-      // Dual tone pleasant airport/hospital chime: 587.33 Hz (D5) -> 880 Hz (A5)
+      // 587.33 Hz (D5) -> 880 Hz (A5)
       const osc1 = ctx.createOscillator();
       const gain1 = ctx.createGain();
       osc1.type = "sine";
@@ -86,7 +88,7 @@ export default function TvDisplayPage() {
   useEffect(() => {
     fetchQueue();
 
-    // Connect to Server-Sent Events (SSE)
+    // SSE connection
     const eventSource = new EventSource("/api/queue/stream");
 
     eventSource.onmessage = (event) => {
@@ -107,10 +109,6 @@ export default function TvDisplayPage() {
       }
     };
 
-    eventSource.onerror = () => {
-      // Auto reconnect handled by browser
-    };
-
     return () => {
       eventSource.close();
     };
@@ -126,7 +124,7 @@ export default function TvDisplayPage() {
     }
   };
 
-  // Compute active doctor boards
+  // Group visits per doctor
   const doctorBoards: Record<string, any> = {};
   visits.forEach((v) => {
     if (!doctorBoards[v.doctorId]) {
@@ -146,7 +144,7 @@ export default function TvDisplayPage() {
 
   const doctorsList = Object.values(doctorBoards);
 
-  // General waiting next 5
+  // All waiting list (next 8)
   const allWaiting = visits
     .filter((v) => v.status === "WAITING")
     .sort((a, b) => {
@@ -154,34 +152,59 @@ export default function TvDisplayPage() {
       if (b.priority === "EMERGENCY" && a.priority !== "EMERGENCY") return 1;
       return a.tokenNumber - b.tokenNumber;
     })
-    .slice(0, 5);
+    .slice(0, 8);
+
+  const activeServing = currentCall
+    ? {
+        tokenNumber: currentCall.tokenNumber,
+        patientName: currentCall.patientName,
+        doctorName: currentCall.doctorName,
+        roomNo: currentCall.roomNo,
+      }
+    : visits.find((v) => v.status === "IN_CONSULTATION")
+    ? {
+        tokenNumber: visits.find((v) => v.status === "IN_CONSULTATION")?.tokenNumber,
+        patientName: visits.find((v) => v.status === "IN_CONSULTATION")?.patient?.fullName,
+        doctorName: visits.find((v) => v.status === "IN_CONSULTATION")?.doctor?.name,
+        roomNo: visits.find((v) => v.status === "IN_CONSULTATION")?.doctor?.roomNo,
+      }
+    : null;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col justify-between selection:bg-teal-500 selection:text-black">
-      {/* Top Banner Bar */}
-      <header className="h-20 border-b border-white/10 px-8 flex items-center justify-between bg-[#0A0A0A]/90">
-        <div className="flex items-center gap-4">
-          <div className="w-11 h-11 rounded-2xl bg-teal-500 flex items-center justify-center text-black font-black shadow-glow-teal">
-            <Activity className="w-7 h-7 stroke-[2.5]" />
-          </div>
-          <div>
-            <h1 className="font-display font-black text-2xl tracking-tight leading-none text-white">
-              NASEEM IJAZ HOSPITAL
-            </h1>
-            <span className="text-xs text-teal-400 font-semibold uppercase tracking-widest block mt-1">
-              OPD Waiting Room & Live Consultation Display • لاہور
+    <div className="min-h-screen bg-[#F6F9FC] text-[#1B2733] flex flex-col justify-between selection:bg-[#E8F1F9]">
+      {/* 1. High-Contrast Top Banner Bar */}
+      <header className="h-20 bg-white border-b-2 border-[#0B4F8A] px-6 sm:px-10 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-6">
+          <Link href="/" className="relative w-64 h-12 block" title="Back to Hospital Portal">
+            <Image
+              src="/images/logo.svg"
+              alt="Naseem Ijaz Hospital"
+              fill
+              priority
+              className="object-contain object-left"
+            />
+          </Link>
+
+          <div className="hidden sm:block h-8 w-px bg-[#E3E9EF]" />
+
+          <div className="hidden md:block">
+            <span className="text-sm font-bold text-[#0B4F8A] font-heading block leading-tight">
+              OUTPATIENT WAITING LOUNGE DISPLAY
+            </span>
+            <span className="text-xs text-[#5B6B7B] font-urdu block">
+              شعبہ آؤٹ پیشنٹ &bull; لائیو ٹوکن بورڈ
             </span>
           </div>
         </div>
 
-        {/* Live Status Indicators & Fullscreen */}
+        {/* Live Status Indicators & Controls */}
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-mono font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse" />
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E6F5F3] border border-[#1E9E8F]/40 text-[#167C70] text-xs font-mono font-bold tracking-wider">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#1E9E8F] animate-pulse" />
             <span>LIVE QUEUE ACTIVE</span>
           </div>
 
-          <div className="text-xl font-mono font-bold text-white tracking-wider">
+          <div className="text-2xl font-mono font-bold text-[#0B4F8A] tracking-wider hidden sm:block">
             {currentTime || "10:00:00 AM"}
           </div>
 
@@ -191,15 +214,15 @@ export default function TvDisplayPage() {
                 setSoundEnabled(!soundEnabled);
                 if (!soundEnabled) playChime();
               }}
-              className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="p-2.5 rounded-lg bg-[#F6F9FC] border border-[#E3E9EF] text-[#5B6B7B] hover:text-[#0B4F8A] transition-colors cursor-pointer"
               title={soundEnabled ? "Mute Calling Chime" : "Enable Calling Chime"}
             >
-              {soundEnabled ? <Volume2 className="w-5 h-5 text-teal-400" /> : <VolumeX className="w-5 h-5 text-neutral-400" />}
+              {soundEnabled ? <Volume2 className="w-5 h-5 text-[#1E9E8F]" /> : <VolumeX className="w-5 h-5 text-[#8A97A5]" />}
             </button>
 
             <button
               onClick={toggleFullScreen}
-              className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="p-2.5 rounded-lg bg-[#F6F9FC] border border-[#E3E9EF] text-[#5B6B7B] hover:text-[#0B4F8A] transition-colors cursor-pointer"
               title="Toggle Fullscreen"
             >
               {isFullScreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
@@ -208,173 +231,154 @@ export default function TvDisplayPage() {
         </div>
       </header>
 
-      {/* Main TV Screen Content */}
+      {/* 2. Main TV Board Area */}
       <main className="flex-1 p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Now Serving Giant Callout Banner */}
-        <div className="lg:col-span-5 space-y-6">
-          {/* Active Call Alert Card */}
-          <div className="relative rounded-3xl border-2 border-teal-500 bg-gradient-to-br from-[#0c2738] to-[#0A0A0A] p-8 text-center shadow-glow-teal overflow-hidden">
-            <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-teal-400 via-teal-200 to-teal-500" />
-
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/20 text-teal-300 font-bold uppercase tracking-widest text-xs mb-4">
-              <Bell className="w-4 h-4 animate-bounce text-teal-400" />
-              <span>NOW SERVING / براہ کرم تشریف لائیں</span>
+        {/* Left Column (7 cols): Giant Now Serving Navy Card */}
+        <div className="lg:col-span-7 space-y-6">
+          {/* Main Giant Callout Navy Card */}
+          <div className="rounded-2xl bg-[#0B3A66] text-white p-8 md:p-10 shadow-lg text-center relative overflow-hidden border-2 border-[#1E9E8F]">
+            <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-[#1E9E8F] text-white font-bold text-xs uppercase tracking-widest mb-4 shadow-sm">
+              <Bell className="w-4 h-4 animate-bounce" />
+              <span>NOW SERVING / برائے مہربانی تشریف لائیں</span>
             </div>
 
-            {/* Giant Token */}
-            <div className="font-display font-black text-8xl md:text-9xl text-white tracking-tighter my-2">
-              #{String(currentCall?.tokenNumber || (visits.find(v => v.status === "IN_CONSULTATION")?.tokenNumber || 1)).padStart(2, "0")}
+            {/* Giant Token Number */}
+            <div className="font-heading font-black text-8xl md:text-9xl text-white tracking-tight my-2">
+              #{String(activeServing?.tokenNumber || 1).padStart(2, "0")}
             </div>
 
             {/* Patient Name */}
-            <h2 className="text-2xl md:text-3xl font-extrabold text-teal-200 truncate">
-              {currentCall?.patientName || visits.find(v => v.status === "IN_CONSULTATION")?.patient?.fullName || "Patient In Consultation"}
+            <h2 className="text-3xl md:text-4xl font-bold text-teal-200 truncate mt-2">
+              {activeServing?.patientName || "Waiting for next patient..."}
             </h2>
 
-            {/* Doctor & Room */}
-            <div className="mt-6 pt-6 border-t border-white/10 flex justify-around text-left">
-              <div>
-                <span className="text-xs uppercase text-[#9A958C] block font-semibold">Proceed To Room</span>
-                <span className="text-2xl font-black text-amber-400 block font-mono">
-                  {currentCall?.roomNo || visits.find(v => v.status === "IN_CONSULTATION")?.doctor?.roomNo || "OPD-101"}
+            {/* Room & Doctor Callout */}
+            <div className="mt-8 pt-6 border-t border-white/20 grid grid-cols-2 gap-4 text-left">
+              <div className="p-4 rounded-xl bg-white/10">
+                <span className="text-xs uppercase text-slate-300 font-bold block mb-1">
+                  Proceed To Room
+                </span>
+                <span className="text-3xl font-black text-amber-300 block font-mono">
+                  {activeServing?.roomNo || "OPD-101"}
                 </span>
               </div>
-              <div>
-                <span className="text-xs uppercase text-[#9A958C] block font-semibold">Consultant</span>
-                <span className="text-lg font-bold text-white block">
-                  {currentCall?.doctorName || visits.find(v => v.status === "IN_CONSULTATION")?.doctor?.name || "Dr. Tariq Mahmood"}
+              <div className="p-4 rounded-xl bg-white/10">
+                <span className="text-xs uppercase text-slate-300 font-bold block mb-1">
+                  Consultant Doctor
+                </span>
+                <span className="text-xl font-bold text-white block truncate">
+                  {activeServing?.doctorName || "Dr. Tariq Mahmood"}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Next in Line Strip */}
-          <div className="rounded-2xl border border-white/10 bg-[#0A0A0A] p-6">
-            <h3 className="font-display font-bold text-sm uppercase tracking-wider text-neutral-400 mb-4 flex items-center justify-between">
-              <span>Next 5 Patients in Line (تیار رہیں)</span>
-              <span className="text-xs text-teal-400 font-mono">{allWaiting.length} Waiting</span>
+          {/* Doctor-wise Active Serving Strip */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#5B6B7B]">
+              Active Consultant Rooms
             </h3>
-
-            {allWaiting.length === 0 ? (
-              <div className="py-6 text-center text-xs text-neutral-500">
-                Lobby queue is clear. All registered patients have been called.
-              </div>
-            ) : (
-              <div className="space-y-2.5">
-                {allWaiting.map((v, i) => (
-                  <div
-                    key={v.id}
-                    className={`flex items-center justify-between p-3.5 rounded-xl border ${
-                      v.priority === "EMERGENCY"
-                        ? "bg-red-950/40 border-red-500/50 text-red-200"
-                        : "bg-[#11171E] border-white/5 text-white"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-300 font-mono font-bold flex items-center justify-center text-sm">
-                        {i + 1}
-                      </span>
-                      <div>
-                        <span className="font-bold text-sm block">{v.patient?.fullName}</span>
-                        <span className="text-xs text-[#9A958C]">
-                          {v.doctor?.name} • Room {v.doctor?.roomNo}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <span className="font-display font-black text-xl text-teal-300 block">
-                        #{String(v.tokenNumber).padStart(2, "0")}
-                      </span>
-                      {v.priority === "EMERGENCY" && (
-                        <span className="text-[10px] font-bold text-red-400 uppercase tracking-widest animate-pulse">
-                          EMERGENCY
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right Column: Multi-Doctor Consultation Boards */}
-        <div className="lg:col-span-7">
-          <div className="rounded-2xl border border-white/10 bg-[#0A0A0A] p-6">
-            <h3 className="font-display font-bold text-base text-white uppercase tracking-wider mb-6 flex items-center justify-between">
-              <span>Doctors OPD Boards (کنسلٹنٹس کی صورتحال)</span>
-              <span className="text-xs text-teal-400 font-mono">{doctorsList.length} Rooms Active</span>
-            </h3>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {doctorsList.map(({ doctor, department, inConsultation, waiting }) => (
+              {doctorsList.slice(0, 4).map((board: any) => (
                 <div
-                  key={doctor.id}
-                  className="rounded-2xl border border-white/10 bg-[#11171E] p-4 flex flex-col justify-between"
+                  key={board.doctor.id}
+                  className="hospital-card p-4 bg-white border border-[#E3E9EF] flex items-center justify-between"
                 >
-                  {/* Doctor Details */}
-                  <div className="border-b border-white/10 pb-3 mb-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-bold text-sm text-white">{doctor.name}</h4>
-                        <span className="text-xs text-teal-400 font-medium block">
-                          {department?.name}
-                        </span>
-                      </div>
-                      <span className="px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-300 font-mono font-black text-xs">
-                        {doctor.roomNo}
-                      </span>
+                  <div>
+                    <div className="font-bold text-sm text-[#1B2733] font-heading">
+                      {board.doctor.name}
+                    </div>
+                    <div className="text-xs text-[#5B6B7B]">
+                      Room <span className="font-bold font-mono text-[#0B4F8A]">{board.doctor.roomNo}</span> &bull; {board.department.name}
                     </div>
                   </div>
 
-                  {/* Active Patient In Room */}
-                  <div className="mb-3">
-                    <span className="text-[10px] uppercase font-bold text-[#9A958C] block mb-1">
-                      Currently In Consultation
-                    </span>
-                    {inConsultation ? (
-                      <div className="p-2.5 rounded-xl bg-teal-950/40 border border-teal-500/30 flex justify-between items-center">
-                        <span className="font-bold text-xs text-teal-200 truncate">
-                          {inConsultation.patient.fullName}
-                        </span>
-                        <span className="font-mono font-black text-base text-teal-400 ml-2">
-                          #{String(inConsultation.tokenNumber).padStart(2, "0")}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="p-2.5 rounded-xl bg-black/40 border border-white/5 text-xs text-neutral-500 text-center">
-                        Available / Awaiting Next Token
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Waiting Counter */}
-                  <div className="flex items-center justify-between text-xs text-[#9A958C] pt-2 border-t border-white/5">
-                    <span>Waiting in Queue:</span>
-                    <span className="font-mono font-bold text-white bg-black/40 px-2 py-0.5 rounded border border-white/5">
-                      {waiting.length} Patients
-                    </span>
+                  <div className="text-right">
+                    <div className="text-[10px] text-[#5B6B7B] uppercase font-bold">Serving</div>
+                    <div className="font-mono text-xl font-black text-[#0B4F8A]">
+                      {board.inConsultation ? `#${board.inConsultation.tokenNumber}` : "—"}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
+
+        {/* Right Column (5 cols): Next Tokens Queue List */}
+        <div className="lg:col-span-5 space-y-4">
+          <div className="hospital-card bg-white p-6 shadow-sm border border-[#E3E9EF]">
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#E3E9EF]">
+              <div>
+                <h3 className="text-base font-bold font-heading text-[#0B4F8A]">
+                  Upcoming Tokens
+                </h3>
+                <span className="text-xs text-[#5B6B7B] font-urdu block">
+                  اگلے مریض برائے مہربانی تیار رہیں
+                </span>
+              </div>
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#E8F1F9] text-[#0B4F8A]">
+                {allWaiting.length} In Queue
+              </span>
+            </div>
+
+            <div className="space-y-2.5">
+              {allWaiting.length > 0 ? (
+                allWaiting.map((v, idx) => (
+                  <div
+                    key={v.id}
+                    className="p-3.5 rounded-xl bg-[#F6F9FC] border border-[#E3E9EF] flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <span className="w-10 h-10 rounded-lg bg-[#0B4F8A] text-white font-mono font-bold text-sm flex items-center justify-center">
+                        #{v.tokenNumber}
+                      </span>
+                      <div>
+                        <span className="font-bold text-sm text-[#1B2733] block truncate max-w-[160px]">
+                          {v.patient.fullName}
+                        </span>
+                        <span className="text-xs text-[#5B6B7B]">
+                          {v.doctor.name} ({v.doctor.roomNo})
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      {v.priority === "EMERGENCY" ? (
+                        <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-300">
+                          PRIORITY
+                        </span>
+                      ) : (
+                        <span className="text-xs font-semibold text-[#1E9E8F]">
+                          Position #{idx + 1}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-12 text-[#8A97A5] text-sm">
+                  All waiting patients have been attended.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </main>
 
-      {/* Bottom Scrolling Emergency Ticker */}
-      <footer className="h-12 bg-teal-950/80 border-t border-teal-500/30 px-6 flex items-center justify-between text-xs text-teal-200">
-        <div className="flex items-center gap-3">
-          <span className="px-2 py-0.5 rounded bg-red-600 text-white font-bold text-[10px] uppercase">
-            HOSPITAL NOTICE
-          </span>
-          <span className="font-medium">
-            Please keep your 80mm Token Slip ready. If you require wheelchair or emergency assistance, inform Reception Desk 1 immediately.
-          </span>
+      {/* 3. Bottom Ticker with Hospital Message */}
+      <footer className="h-14 bg-[#0B3A66] text-white px-6 flex items-center justify-between border-t border-[#092E52] text-xs font-medium overflow-hidden">
+        <div className="flex items-center gap-2 font-bold text-amber-300 shrink-0">
+          <Clock className="w-4 h-4" />
+          <span>HOSPITAL NOTICE:</span>
         </div>
-        <div className="font-mono text-teal-300 font-bold shrink-0">
-          UAN: +92 42 3578 9000
+
+        <div className="truncate px-4 text-slate-200">
+          Welcome to Naseem Ijaz Hospital &bull; Please wait comfortably in the lobby until your token number is displayed and called &bull; For emergency assistance, please notify Reception Desk 1 immediately &bull; Helpline: +92 42 3578 9999
+        </div>
+
+        <div className="shrink-0 text-slate-300 font-mono hidden sm:block">
+          Plot 14-B Jail Road, Lahore
         </div>
       </footer>
     </div>

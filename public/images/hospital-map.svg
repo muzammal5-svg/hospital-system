@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none">
+  <rect width="800" height="500" fill="#EBF2F7"/>
+  <!-- Roads grid -->
+  <path d="M0 240H800" stroke="#D3DFEC" stroke-width="32"/>
+  <path d="M0 240H800" stroke="#FFFFFF" stroke-width="20"/>
+  <text x="70" y="232" font-family="'Inter', sans-serif" font-size="13" font-weight="600" fill="#71869B">JAIL ROAD (MAIN BOULEVARD)</text>
+  
+  <path d="M280 0V500" stroke="#D3DFEC" stroke-width="24"/>
+  <path d="M280 0V500" stroke="#FFFFFF" stroke-width="14"/>
+  <text x="290" y="80" font-family="'Inter', sans-serif" font-size="12" font-weight="500" fill="#71869B" transform="rotate(90 290 80)">CANAL ROAD LINK</text>
+
+  <path d="M560 0V500" stroke="#D3DFEC" stroke-width="24"/>
+  <path d="M560 0V500" stroke="#FFFFFF" stroke-width="14"/>
+  
+  <path d="M0 110H800" stroke="#E3EAF2" stroke-width="16"/>
+  <path d="M0 110H800" stroke="#FFFFFF" stroke-width="10"/>
+
+  <path d="M0 380H800" stroke="#E3EAF2" stroke-width="16"/>
+  <path d="M0 380H800" stroke="#FFFFFF" stroke-width="10"/>
+
+  <!-- Hospital Campus Polygon -->
+  <rect x="340" y="160" width="180" height="130" rx="12" fill="#0B4F8A" opacity="0.08"/>
+  <rect x="340" y="160" width="180" height="130" rx="12" stroke="#0B4F8A" stroke-width="2" stroke-dasharray="4 4"/>
+  <rect x="350" y="170" width="160" height="80" rx="8" fill="#FFFFFF" filter="drop-shadow(0 4px 12px rgba(11,79,138,0.12))"/>
+  
+  <!-- Hospital Building Label inside campus -->
+  <text x="365" y="202" font-family="'Poppins', sans-serif" font-weight="700" font-size="14" fill="#0B4F8A">Naseem Ijaz Hospital</text>
+  <text x="365" y="222" font-family="'Inter', sans-serif" font-weight="500" font-size="11" fill="#5B6B7B">Plot 14-B, Medical Enclave</text>
+
+  <!-- Marker Pin -->
+  <g transform="translate(420, 115)">
+    <path d="M20 0C8.954 0 0 8.954 0 20C0 35 20 52 20 52C20 52 40 35 40 20C40 8.954 31.046 0 20 0Z" fill="#D64545"/>
+    <circle cx="20" cy="20" r="10" fill="#FFFFFF"/>
+    <path d="M20 15V25M15 20H25" stroke="#D64545" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Nearby Landmark labels -->
+  <rect x="80" y="290" width="140" height="36" rx="6" fill="#FFFFFF" stroke="#D3DFEC"/>
+  <text x="92" y="313" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#5B6B7B">Gulberg Main Market</text>
+
+  <rect x="580" y="290" width="140" height="36" rx="6" fill="#FFFFFF" stroke="#D3DFEC"/>
+  <text x="596" y="313" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#5B6B7B">Services Hospital ER</text>
+
+  <!-- Compass / Directions -->
+  <g transform="translate(730, 40)">
+    <circle cx="24" cy="24" r="22" fill="#FFFFFF" stroke="#D3DFEC"/>
+    <text x="21" y="17" font-family="'Inter', sans-serif" font-size="10" font-weight="700" fill="#0B4F8A">N</text>
+    <path d="M24 18V34M20 22L24 18L28 22" stroke="#0B4F8A" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>
