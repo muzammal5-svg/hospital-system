@@ -3,32 +3,63 @@
 
 A deployable outpatient (OPD) reception, queue orchestration, consultation, and patient management platform custom-built for **Naseem Ijaz Hospital** (Jail Road, Lahore, Pakistan).
 
-Designed with the **Kontrora SaaS Design System** (extracted from [kontrora.com](https://www.kontrora.com/)), adapted for Pakistani clinical operations with keyboard-first workflows, Pakistani CNIC & phone formatting, dual-language English/Urdu support, 80mm thermal receipt printing, A4 letterhead prescription printing, and Server-Sent Events (SSE) TV waiting room screens.
+Designed with a **clean, trustworthy, human-centered hospital design system** inspired by institutions like Aga Khan University Hospital, Shaukat Khanum, Mayo Clinic, and Cleveland Clinic. Built specifically for Pakistani clinical operations with fast keyboard-first workflows, Pakistani CNIC & phone formatting, dual-language English/Urdu support, 80mm thermal receipt printing, A4 letterhead prescription printing, and Server-Sent Events (SSE) TV waiting room screens.
 
 ---
 
-## 📸 Verified System Screenshots (Phase 1 Redesign & Phase 2 QA Evidence)
+## 📸 Verified System Screenshots (Complete Light Redesign)
 
 All screenshots captured directly from the live running application via headless Edge:
 
 | View | Screenshot Path | Description |
 |---|---|---|
-| **Public Landing Hero (1440px)** | [`docs/after/iter3/landing_1440px.png`](./docs/after/iter3/landing_1440px.png) | Kontrora deep-gradient mesh hero, fluid Syne headline, micro-tracked pill CTAs |
-| **Public Landing Mobile (390px)** | [`docs/after/iter3/landing_390px.png`](./docs/after/iter3/landing_390px.png) | Responsive mobile view with clean spacing and touch-optimized layout |
-| **Reception Intake & Token Desk** | [`docs/after/iter3/reception_1440px.png`](./docs/after/iter3/reception_1440px.png) | 30-sec keyboard patient intake, duplicate warnings, and instant 80mm slip |
-| **OPD Live TV Display (/display)** | [`docs/after/iter3/display_1440px.png`](./docs/after/iter3/display_1440px.png) | Airport-style waiting board with pulsing now-serving callout and audio chime |
-| **Doctor Clinical Console** | [`docs/after/iter3/doctor_1440px.png`](./docs/after/iter3/doctor_1440px.png) | Patient vitals, provisional diagnosis, medicine autocomplete, and A4 letterhead Rx |
-| **Billing & Cash Closing** | [`docs/after/iter3/billing_1440px.png`](./docs/after/iter3/billing_1440px.png) | Invoices ledger, partial/full refunds, and daily cash closing handover |
-| **80mm Thermal Receipt Render** | [`docs/qa-evidence/opd_thermal_receipt_80mm.png`](./docs/qa-evidence/opd_thermal_receipt_80mm.png) | Thermal receipt modal formatted for 80mm roll printers with QR verification |
-| **Online Appointment Booking** | [`docs/after/iter3/public_appointments_1440px.png`](./docs/after/iter3/public_appointments_1440px.png) | Self-service booking portal with doctor schedules and SMS confirmation |
+| **Public Landing Hero (1440px)** | [`docs/redesign/01_home_desktop.png`](./docs/redesign/01_home_desktop.png) | Clean light split hero with real hospital team photo, OPD timings card, and quick booking CTAs |
+| **Public Landing Full Page** | [`docs/redesign/01_home_desktop_full.png`](./docs/redesign/01_home_desktop_full.png) | Complete 12-section hospital portal: about stats, 10 departments, 8 doctors, patient journey, testimonials, map |
+| **Public Landing Mobile (390px)** | [`docs/redesign/01_home_mobile.png`](./docs/redesign/01_home_mobile.png) | Fully responsive mobile view with clean spacing and touch-optimized action cards |
+| **Online Appointment Booking** | [`docs/redesign/02_appointments_desktop.png`](./docs/redesign/02_appointments_desktop.png) | Clean self-service patient booking portal with doctor schedules and SMS confirmation |
+| **Split-Screen Login** | [`docs/redesign/03_login_split_desktop.png`](./docs/redesign/03_login_split_desktop.png) | Modern split view: hospital photography with navy overlay on left, clean white auth card with one-click demo credentials on right |
+| **OPD Live TV Display (/display)** | [`docs/redesign/04_tv_display_light.png`](./docs/redesign/04_tv_display_light.png) | High-contrast light board with airport-style token callouts, navy "Now Serving" cards, next tokens, and ticker |
+| **Admin Dashboard Overview** | [`docs/redesign/05_dashboard_overview.png`](./docs/redesign/05_dashboard_overview.png) | 4 KPI cards, hourly patient flow area chart, patient composition donut, department revenue bar chart, and Queue Alerts |
+| **Reception Intake & Token Desk** | [`docs/redesign/06_reception_desk.png`](./docs/redesign/06_reception_desk.png) | 30-sec keyboard patient intake, duplicate warnings, recent patients panel, and instant 80mm slip |
+| **Doctor Clinical Console** | [`docs/redesign/07_doctor_console.png`](./docs/redesign/07_doctor_console.png) | Patient queue list, allergy alert banner, vitals, provisional diagnosis, medicine autocomplete, and A4 letterhead Rx |
+| **Patients Directory** | [`docs/redesign/08_patients_directory.png`](./docs/redesign/08_patients_directory.png) | Complete patient registry table with soft status chips, search/filters, and view details |
+| **Live Queue Kanban** | [`docs/redesign/09_live_queue_kanban.png`](./docs/redesign/09_live_queue_kanban.png) | 3-column live queue tracking (Waiting, In Consultation, Completed) with doctor room filters |
+| **Billing & Cash Closing** | [`docs/redesign/10_billing_desk.png`](./docs/redesign/10_billing_desk.png) | Invoices ledger, partial/full refunds, and daily cash closing handover |
+| **Reports & Analytics** | [`docs/redesign/11_reports_analytics.png`](./docs/redesign/11_reports_analytics.png) | Operational OPD charts (navy/teal palette), queue status directives, audit log, and Excel export |
+| **Settings & Hospital Branding** | [`docs/redesign/12_settings_branding.png`](./docs/redesign/12_settings_branding.png) | Hospital profile configuration, thermal/A4 letterhead templates, and database backup trigger |
+
+---
+
+## 🎨 Hospital Design System & Color Palette
+
+The interface follows a calm, clean, trustworthy visual hierarchy:
+
+- **Color Tokens**:
+  - **Primary Navy**: `#0B4F8A` (hover `#093F6E`, light tint `#E8F1F9`) — Trustworthy medical authority.
+  - **Secondary Teal**: `#1E9E8F` (hover `#167C70`, light tint `#E6F5F3`) — Healing, hygiene, modern care.
+  - **Background**: `#F6F9FC` (light hospital gray-blue)
+  - **Surface / Cards**: `#FFFFFF` with 1px border `#E3E9EF` and soft shadow (`0 1px 3px rgba(16,24,40,0.06)`).
+  - **Text Primary**: `#1B2733` | **Secondary**: `#5B6B7B` | **Muted**: `#8A97A5`
+  - **Status Accents**: Success `#2E9E6B`, Warning `#E39B12`, Danger `#D64545`, Info `#2F80C9`.
+  - **Sidebar**: Solid navy `#0B3A66` with white text; active item `#14538F` with 3px teal indicator.
+  - **Buttons**: 8px radius (`rounded-lg`) solid navy `#0B4F8A` or secondary white with navy border (no pill buttons).
+  - **Cards**: 12px radius (`rounded-xl`).
+- **Typography**:
+  - Headings: `Poppins` (600/700) loaded via `next/font/google`.
+  - Body & UI: `Inter` (400/500/600).
+  - Urdu Localization: `Noto Nastaliq Urdu` with automated RTL layout (`dir="rtl"`).
+- **Real Verified Photography**:
+  - All images stored locally in `/public/images/`, `/public/images/doctors/`, and `/public/images/departments/` with full photographer attribution in [`/public/images/CREDITS.md`](./public/images/CREDITS.md).
+  - No external CDN dependencies for images. All `<Image>` tags use explicit dimensions and lazy loading.
+- **Copy & Tone**:
+  - Plain, human, dignified hospital language. Zero AI buzzwords. "Queue Alerts" for OPD queue management.
 
 ---
 
 ## 🧪 QA Verification Status (Browser-Driven Playwright Suite)
 
 - **Audit Report**: Detailed breakdown available in [`/docs/QA-REPORT.md`](./docs/QA-REPORT.md)
-- **Design Audit**: Iteration notes available in [`/docs/design-audit.md`](./docs/design-audit.md)
-- **Test Command**: `npm run test:e2e` (runs real Playwright Edge test runner)
+- **Test Command**: `node tests/e2e/critical-flows.js` (runs real Playwright Edge test runner)
 - **Unit Test Command**: `npm test` (runs Vitest core suite)
 - **Critical Flow Results**: **14 / 14 PASSED (100% Pass Rate)**:
   - `AUTH-01`: Invalid password rejection & alert banner &rarr; **PASS**
@@ -48,36 +79,17 @@ All screenshots captured directly from the live running application via headless
 
 ---
 
-## 🎨 Design System & Kontrora Tokens
-
-The design tokens were extracted directly from `kontrora.com` and mapped to hospital operations in [`/design/tokens.json`](./design/tokens.json).
-
-- **Typography**:
-  - Display / Headings: `Syne` (weights 700/800, tight letter-spacing `-0.02em`)
-  - Body & Numbers: `DM Sans` (weights 400, 500, 600, 700)
-  - Urdu Locale: `Noto Nastaliq Urdu` with automated RTL layout (`dir="rtl"`)
-- **Color Palette**:
-  - Public Hero & Dark Mode: `#050505` to `#07161F` deep radial gradient
-  - Kontrora Bone Accent: `#EDE8E0` (dim: `rgba(237, 232, 224, 0.08)`)
-  - Primary Clinical Teal: `#0EA5A4` (hover: `#0B7F86`, glow: `rgba(14, 165, 164, 0.35)`)
-  - Medical Blue: `#2563EB`
-  - Emergency Alert: `#DC2626` (pulsing red)
-  - Inside App: **Light Mode by default** (`#F4F8FA` surfaces) for long clinical shifts, with an instant dark mode toggle.
-- **Controls**: Pill-shaped CTA buttons (`rounded-full`, min 44px height for touch screens).
-
----
-
 ## ⚙️ Tech Stack
 
 - **Framework**: Next.js 14 (App Router, Standalone Docker Output) + TypeScript
-- **Styling**: Tailwind CSS + Custom CSS Variables + Framer Motion
+- **Styling**: Tailwind CSS + Custom CSS Variables
 - **Database & ORM**: PostgreSQL (Production / Docker) & SQLite (Zero-config local dev) via Prisma ORM
 - **Authentication**: NextAuth.js (Credentials Provider with bcrypt + JWT sessions)
 - **Real-Time Queue**: Server-Sent Events (SSE) for live TV display with Web Audio API hospital chime
 - **Printing**: Print-optimized CSS for 80mm thermal slips & A4 letterhead prescriptions
 - **Exporting**: ExcelJS for multi-sheet reports & Recharts for KPI charts
 - **i18n**: English & Urdu (`Noto Nastaliq Urdu`, RTL auto-switch)
-- **Testing**: Vitest automated test suite
+- **Testing**: Vitest automated unit test suite + Playwright E2E browser suite
 
 ---
 
@@ -102,8 +114,8 @@ The login page (`/login`) includes **one-click demo credential buttons**:
 
 ### 1. Clone & Install
 ```bash
-git clone <repo-url>
-cd "hospital managment system"
+git clone https://github.com/muzammal5-svg/hospital-system.git
+cd "hospital-system"
 npm install
 ```
 
@@ -125,11 +137,20 @@ npm run db:seed
 
 ### 4. Run Automated Tests
 ```bash
-npm run test
+# Core unit tests
+npm test
+
+# Full browser E2E test suite
+node tests/e2e/critical-flows.js
 ```
 
-### 5. Start Next.js Development Server
+### 5. Start Production Server or Dev Server
 ```bash
+# Production mode (fastest)
+npm run build
+npm start
+
+# Development mode
 npm run dev
 ```
 Open **[http://localhost:3000](http://localhost:3000)** in your browser.
@@ -182,7 +203,7 @@ sudo systemctl enable --now docker
 ### Step 2: Clone Project & Launch Containers
 ```bash
 cd /opt
-sudo git clone <repo-url> hospital
+sudo git clone https://github.com/muzammal5-svg/hospital-system.git hospital
 cd hospital
 sudo docker-compose up -d --build
 ```
