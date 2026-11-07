@@ -103,7 +103,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="reception@naseemijaz.pk"
-                className="w-full bg-[#11171E] border border-white/10 rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-teal-500"
+                className="w-full bg-[#11171E] border border-white/[0.12] rounded-xl px-4 py-3 min-h-[44px] text-white outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/50 transition-all placeholder:text-neutral-500"
               />
             </div>
 
@@ -117,14 +117,14 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-[#11171E] border border-white/10 rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-teal-500"
+                className="w-full bg-[#11171E] border border-white/[0.12] rounded-xl px-4 py-3 min-h-[44px] text-white outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/50 transition-all placeholder:text-neutral-500"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="btn-pill w-full bg-teal-500 hover:bg-teal-400 text-black font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-glow-teal disabled:opacity-50 mt-2"
+              className="btn-pill w-full bg-teal-500 hover:bg-teal-400 text-black font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-glow-teal disabled:opacity-50 mt-4 min-h-[44px]"
             >
               {loading ? (
                 <>

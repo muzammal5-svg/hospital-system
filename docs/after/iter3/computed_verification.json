@@ -1,0 +1,10 @@
+{
+  "h1Font": "__Syne_d8518d, __Syne_Fallback_d8518d, Syne, sans-serif",
+  "h1Size": "92.8px",
+  "h1Weight": "800",
+  "h1LineHeight": "95.584px",
+  "h1LetterSpacing": "-3.5264px",
+  "btnFont": "__DM_Sans_d9d98a, __DM_Sans_Fallback_d9d98a, -apple-system, BlinkMacSystemFont, sans-serif",
+  "btnLetterSpacing": "1.44px",
+  "btnTextTransform": "uppercase"
+}

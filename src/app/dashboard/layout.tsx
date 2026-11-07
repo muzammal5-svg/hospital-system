@@ -232,10 +232,17 @@ export default function DashboardLayout({
       {/* Main App Workspace */}
       <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
         {/* Top Desktop App Bar */}
-        <header className="hidden md:flex h-16 bg-white dark:bg-[#0B0F14] border-b border-neutral-200 dark:border-white/10 px-8 items-center justify-between sticky top-0 z-30">
-          <div className="flex items-center gap-6">
-            <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-              Reception & Patient Management System • Lahore
+        <header className="hidden md:flex h-16 bg-white dark:bg-[#0B0F14] border-b border-neutral-200 dark:border-white/10 px-8 items-center justify-between sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/95 dark:bg-[#0B0F14]/95">
+          <div className="flex items-center gap-3 text-xs">
+            <span className="font-semibold text-neutral-400 dark:text-neutral-500">
+              Naseem Ijaz Hospital
+            </span>
+            <span className="text-neutral-300 dark:text-neutral-600">/</span>
+            <span className="font-bold text-neutral-800 dark:text-white capitalize">
+              {pathname.replace("/dashboard/", "").replace("/dashboard", "Overview") || "Overview"}
+            </span>
+            <span className="ml-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wider uppercase bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20">
+              {role}
             </span>
           </div>
 
@@ -243,7 +250,7 @@ export default function DashboardLayout({
             <Link
               href="/display"
               target="_blank"
-              className="btn-pill bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/20 text-xs font-bold gap-2 py-1.5 px-3"
+              className="btn-pill bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/20 text-xs font-bold gap-2 py-1.5 px-4 shadow-sm"
             >
               <Tv className="w-3.5 h-3.5" />
               <span>Open TV Display</span>

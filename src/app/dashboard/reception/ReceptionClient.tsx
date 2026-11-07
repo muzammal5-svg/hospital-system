@@ -33,6 +33,24 @@ export default function ReceptionClient({
 }: ReceptionClientProps) {
   const [activeTab, setActiveTab] = useState<"register" | "visit" | "search">("register");
 
+  // Keyboard shortcuts: F2 = New Patient Intake, F3 = Patient Search, F4 = Issue OPD Token
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "F2") {
+        e.preventDefault();
+        setActiveTab("register");
+      } else if (e.key === "F3") {
+        e.preventDefault();
+        setActiveTab("search");
+      } else if (e.key === "F4") {
+        e.preventDefault();
+        setActiveTab("visit");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Registration Form State
   const [fullName, setFullName] = useState("");
   const [fatherOrHusbandName, setFatherOrHusbandName] = useState("");

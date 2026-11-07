@@ -7,14 +7,44 @@ Designed with the **Kontrora SaaS Design System** (extracted from [kontrora.com]
 
 ---
 
-## 📸 System Screenshots
+## 📸 Verified System Screenshots (Phase 1 Redesign & Phase 2 QA Evidence)
 
-| View | Preview |
-|---|---|
-| **Public Website Hero** | `docs/screenshots/01_landing_page.png` |
-| **Online Doctor Appointments** | `docs/screenshots/02_online_appointments.png` |
-| **Live TV Waiting Room Screen** | `docs/screenshots/03_tv_waiting_display.png` |
-| **Staff Authentication Portal** | `docs/screenshots/04_staff_login.png` |
+All screenshots captured directly from the live running application via headless Edge:
+
+| View | Screenshot Path | Description |
+|---|---|---|
+| **Public Landing Hero (1440px)** | [`docs/after/iter3/landing_1440px.png`](./docs/after/iter3/landing_1440px.png) | Kontrora deep-gradient mesh hero, fluid Syne headline, micro-tracked pill CTAs |
+| **Public Landing Mobile (390px)** | [`docs/after/iter3/landing_390px.png`](./docs/after/iter3/landing_390px.png) | Responsive mobile view with clean spacing and touch-optimized layout |
+| **Reception Intake & Token Desk** | [`docs/after/iter3/reception_1440px.png`](./docs/after/iter3/reception_1440px.png) | 30-sec keyboard patient intake, duplicate warnings, and instant 80mm slip |
+| **OPD Live TV Display (/display)** | [`docs/after/iter3/display_1440px.png`](./docs/after/iter3/display_1440px.png) | Airport-style waiting board with pulsing now-serving callout and audio chime |
+| **Doctor Clinical Console** | [`docs/after/iter3/doctor_1440px.png`](./docs/after/iter3/doctor_1440px.png) | Patient vitals, provisional diagnosis, medicine autocomplete, and A4 letterhead Rx |
+| **Billing & Cash Closing** | [`docs/after/iter3/billing_1440px.png`](./docs/after/iter3/billing_1440px.png) | Invoices ledger, partial/full refunds, and daily cash closing handover |
+| **80mm Thermal Receipt Render** | [`docs/qa-evidence/opd_thermal_receipt_80mm.png`](./docs/qa-evidence/opd_thermal_receipt_80mm.png) | Thermal receipt modal formatted for 80mm roll printers with QR verification |
+| **Online Appointment Booking** | [`docs/after/iter3/public_appointments_1440px.png`](./docs/after/iter3/public_appointments_1440px.png) | Self-service booking portal with doctor schedules and SMS confirmation |
+
+---
+
+## 🧪 QA Verification Status (Browser-Driven Playwright Suite)
+
+- **Audit Report**: Detailed breakdown available in [`/docs/QA-REPORT.md`](./docs/QA-REPORT.md)
+- **Design Audit**: Iteration notes available in [`/docs/design-audit.md`](./docs/design-audit.md)
+- **Test Command**: `npm run test:e2e` (runs real Playwright Edge test runner)
+- **Unit Test Command**: `npm test` (runs Vitest core suite)
+- **Critical Flow Results**: **14 / 14 PASSED (100% Pass Rate)**:
+  - `AUTH-01`: Invalid password rejection & alert banner &rarr; **PASS**
+  - `AUTH-02`: Admin login & session persistence across reload &rarr; **PASS**
+  - `AUTH-03`: Role-based route protection (Receptionist blocked from `/settings`) &rarr; **PASS**
+  - `AUTH-04`: CNIC masking for non-admin (`35201-*******-1`) vs unmasked for Admin &rarr; **PASS**
+  - `PAT-01`: Patient registration with Urdu characters & auto sequential MR number &rarr; **PASS**
+  - `PAT-02`: Live duplicate detection warning by mobile number &rarr; **PASS**
+  - `OPD-01`: OPD consultation token creation & 80mm thermal receipt render &rarr; **PASS**
+  - `APT-01`: Public online appointment booking with SMS notification simulation &rarr; **PASS**
+  - `APT-02`: Double-booking prevention (composite unique constraint returns HTTP 409 Conflict) &rarr; **PASS**
+  - `QUE-01`: SSE Live Queue TV Display connection & Web Audio chime callout &rarr; **PASS**
+  - `DOC-01`: Doctor consultation console with vitals, diagnosis, and prescription builder &rarr; **PASS**
+  - `BIL-01`: Billing ledger invoices and partial/full refund workflow &rarr; **PASS**
+  - `REP-01`: Operational KPIs & multi-sheet Excel download (`.xlsx`) &rarr; **PASS**
+  - `SET-01`: Hospital branding and emergency helpline configuration updates &rarr; **PASS**
 
 ---
 

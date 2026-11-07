@@ -75,7 +75,7 @@ export default function PatientsClient({ initialPatients, userRole }: PatientsCl
               </div>
               <div>
                 <span className="text-neutral-400 block text-[10px]">CNIC ({userRole === "ADMIN" ? "Unmasked" : "Masked"})</span>
-                <span className="font-mono font-semibold text-neutral-800 dark:text-neutral-200">{formatCNIC(selectedPatient.cnic)}</span>
+                <span className="font-mono font-semibold text-neutral-800 dark:text-neutral-200">{selectedPatient.cnic || "—"}</span>
               </div>
               <div>
                 <span className="text-neutral-400 block text-[10px]">Blood Group</span>
@@ -216,7 +216,7 @@ export default function PatientsClient({ initialPatients, userRole }: PatientsCl
                     </td>
                     <td className="py-3 px-4 font-mono">{p.mobile}</td>
                     <td className="py-3 px-4 font-mono">
-                      {formatCNIC(p.cnic)}
+                      {p.cnic || "—"}
                     </td>
                     <td className="py-3 px-4">{p.city}</td>
                     <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>

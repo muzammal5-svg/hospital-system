@@ -1,0 +1,72 @@
+{
+  "h1": {
+    "fontFamily": "Syne, \"DM Sans\", sans-serif",
+    "fontSize": "68px",
+    "fontWeight": "700",
+    "lineHeight": "78.2px",
+    "letterSpacing": "-1.7px",
+    "color": "rgb(237, 232, 224)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "borderRadius": "0px",
+    "padding": "0px",
+    "margin": "0px 0px 24px",
+    "border": "0px none rgb(237, 232, 224)",
+    "boxShadow": "none"
+  },
+  "h2": {
+    "fontFamily": "Syne, \"DM Sans\", sans-serif",
+    "fontSize": "44px",
+    "fontWeight": "700",
+    "lineHeight": "52.8px",
+    "letterSpacing": "-1.1px",
+    "color": "rgb(237, 232, 224)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "borderRadius": "0px",
+    "padding": "0px",
+    "margin": "0px 0px 20px",
+    "border": "0px none rgb(237, 232, 224)",
+    "boxShadow": "none"
+  },
+  "heroButton": {
+    "fontFamily": "\"DM Sans\", sans-serif",
+    "fontSize": "11.52px",
+    "fontWeight": "800",
+    "lineHeight": "normal",
+    "letterSpacing": "1.152px",
+    "color": "rgba(255, 255, 255, 0.75)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "borderRadius": "0px",
+    "padding": "6px 4px",
+    "margin": "0px",
+    "border": "0px none rgba(255, 255, 255, 0.75)",
+    "boxShadow": "none"
+  },
+  "nav": {
+    "fontFamily": "\"DM Sans\", sans-serif",
+    "fontSize": "16px",
+    "fontWeight": "400",
+    "lineHeight": "26.4px",
+    "letterSpacing": "normal",
+    "color": "rgb(237, 232, 224)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "borderRadius": "0px",
+    "padding": "0px 40px",
+    "margin": "0px",
+    "border": "",
+    "boxShadow": "none"
+  },
+  "card": {
+    "fontFamily": "\"DM Sans\", sans-serif",
+    "fontSize": "16px",
+    "fontWeight": "400",
+    "lineHeight": "26.4px",
+    "letterSpacing": "normal",
+    "color": "rgb(237, 232, 224)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "borderRadius": "0px",
+    "padding": "28px 0px",
+    "margin": "0px",
+    "border": "",
+    "boxShadow": "none"
+  }
+}

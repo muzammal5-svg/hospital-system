@@ -18,43 +18,46 @@ export default async function AppointmentsPage({
   ]);
 
   return (
-    <div className="bg-[#050505] text-[#EDE8E0] min-h-screen">
+    <div className="bg-[#050505] text-[#EDE8E0] min-h-screen selection:bg-teal-500 selection:text-black">
       <Navbar />
 
-      <main className="pt-32 pb-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-xs font-bold uppercase tracking-widest text-teal-400 block mb-2">
-              Patient Scheduling
+      <main className="relative pt-40 pb-32 overflow-hidden bg-gradient-to-b from-[#07161f] via-[#05090e] to-[#050505]">
+        {/* Ambient Glow Mesh */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(14,165,164,0.18)_0%,transparent_65%)] pointer-events-none" />
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-400 block mb-3">
+              Patient Scheduling Portal
             </span>
-            <h1 className="font-display font-extrabold text-3xl sm:text-5xl text-white tracking-tight">
+            <h1 className="section-headline text-white tracking-tight">
               Book a Specialist Doctor
             </h1>
-            <p className="mt-3 text-xs sm:text-sm text-[#9A958C] max-w-xl mx-auto">
-              Choose your doctor and preferred date. Our OPD queue engine reserves your slot without double-booking.
+            <p className="mt-4 text-sm sm:text-base text-[#9A958C] max-w-xl mx-auto">
+              Choose your doctor and preferred date. Our OPD queue engine reserves your slot with zero double-booking and dispatches an instant SMS confirmation.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-[#0A0A0A] p-6 sm:p-10 shadow-2xl">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0A0D12] p-8 sm:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
             <PublicBookingForm departments={departments} doctors={doctors} />
           </div>
 
           {/* Guidelines */}
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs text-[#9A958C]">
-            <div className="p-4 rounded-xl border border-white/5 bg-[#0A0A0A]">
-              <Clock className="w-4 h-4 text-teal-400 mb-2" />
-              <h4 className="font-bold text-white mb-1">Arrive 15 Mins Early</h4>
-              <p>Please present your booking reference at Desk 1 to receive your consultation slip.</p>
+          <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs text-[#9A958C]">
+            <div className="p-5 rounded-2xl border border-white/[0.08] bg-[#0A0D12]">
+              <Clock className="w-5 h-5 text-teal-400 mb-3" />
+              <h4 className="font-bold text-white text-sm mb-1.5">Arrive 15 Mins Early</h4>
+              <p className="leading-relaxed">Present your booking reference code at Reception Desk 1 to receive your 80mm consultation token slip.</p>
             </div>
-            <div className="p-4 rounded-xl border border-white/5 bg-[#0A0A0A]">
-              <ShieldCheck className="w-4 h-4 text-teal-400 mb-2" />
-              <h4 className="font-bold text-white mb-1">Fee at Reception</h4>
-              <p>Consultation fees are collected upon arrival via Cash, Debit/Credit Card, or JazzCash.</p>
+            <div className="p-5 rounded-2xl border border-white/[0.08] bg-[#0A0D12]">
+              <ShieldCheck className="w-5 h-5 text-teal-400 mb-3" />
+              <h4 className="font-bold text-white text-sm mb-1.5">Pay at Front Desk</h4>
+              <p className="leading-relaxed">Consultation fee is collected upon arrival via Cash, Credit/Debit Card, JazzCash, or Easypaisa.</p>
             </div>
-            <div className="p-4 rounded-xl border border-white/5 bg-[#0A0A0A]">
-              <MapPin className="w-4 h-4 text-teal-400 mb-2" />
-              <h4 className="font-bold text-white mb-1">Jail Road, Lahore</h4>
-              <p>Complimentary parking and wheelchair assistance available at main reception entrance.</p>
+            <div className="p-5 rounded-2xl border border-white/[0.08] bg-[#0A0D12]">
+              <MapPin className="w-5 h-5 text-teal-400 mb-3" />
+              <h4 className="font-bold text-white text-sm mb-1.5">Jail Road, Lahore</h4>
+              <p className="leading-relaxed">Complimentary valet parking and wheelchair assistance available at the main outpatient entrance.</p>
             </div>
           </div>
         </div>
