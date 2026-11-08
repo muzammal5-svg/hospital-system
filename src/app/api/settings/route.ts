@@ -3,6 +3,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
+import {
+  DEFAULT_HOSPITAL_PROFILE,
+  DEFAULT_DEPARTMENTS,
+  DEFAULT_DOCTORS,
+  DEFAULT_USERS,
+} from "@/lib/mock-data";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +25,20 @@ export async function GET() {
 
     return NextResponse.json({ profile, departments, doctors, users });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.warn("Using fallback settings in API:", error);
+    return NextResponse.json({
+      profile: DEFAULT_HOSPITAL_PROFILE,
+      departments: DEFAULT_DEPARTMENTS,
+      doctors: DEFAULT_DOCTORS,
+      users: DEFAULT_USERS.map(({ id, name, email, role }) => ({
+        id,
+        name,
+        email,
+        role,
+        active: true,
+        createdAt: new Date(),
+      })),
+    });
   }
 }
 

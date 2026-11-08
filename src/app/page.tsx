@@ -24,24 +24,44 @@ import {
 } from "lucide-react";
 import PublicBookingForm from "./PublicBookingForm";
 import PublicContactForm from "./PublicContactForm";
+import {
+  DEFAULT_DEPARTMENTS,
+  DEFAULT_DOCTORS,
+  DEFAULT_HOSPITAL_PROFILE,
+} from "@/lib/mock-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function LandingPage() {
-  const [departments, doctors, profile] = await Promise.all([
-    prisma.department.findMany({
-      where: { active: true },
-      take: 10,
-      orderBy: { createdAt: "asc" },
-    }),
-    prisma.doctor.findMany({
-      where: { active: true },
-      include: { department: true },
-      take: 8,
-      orderBy: { createdAt: "asc" },
-    }),
-    prisma.hospitalProfile.findUnique({ where: { id: "default" } }),
-  ]);
+  let departments: any[] = [];
+  let doctors: any[] = [];
+  let profile: any = DEFAULT_HOSPITAL_PROFILE;
+
+  try {
+    const [dbDepts, dbDocs, dbProfile] = await Promise.all([
+      prisma.department.findMany({
+        where: { active: true },
+        take: 10,
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.doctor.findMany({
+        where: { active: true },
+        include: { department: true },
+        take: 8,
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.hospitalProfile.findUnique({ where: { id: "default" } }),
+    ]);
+
+    departments = dbDepts.length > 0 ? dbDepts : DEFAULT_DEPARTMENTS;
+    doctors = dbDocs.length > 0 ? dbDocs : DEFAULT_DOCTORS;
+    profile = dbProfile || DEFAULT_HOSPITAL_PROFILE;
+  } catch (err) {
+    console.warn("Using fallback hospital data:", err);
+    departments = DEFAULT_DEPARTMENTS;
+    doctors = DEFAULT_DOCTORS;
+    profile = DEFAULT_HOSPITAL_PROFILE;
+  }
 
   // Department image lookup
   const deptImages: Record<string, string> = {

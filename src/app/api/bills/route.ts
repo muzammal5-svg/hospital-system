@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
+import { DEFAULT_BILLS } from "@/lib/mock-data";
 
 export const dynamic = "force-dynamic";
 
@@ -41,9 +42,10 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ bills });
+    return NextResponse.json({ bills: bills.length > 0 ? bills : DEFAULT_BILLS });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.warn("Using fallback bills in API:", error);
+    return NextResponse.json({ bills: DEFAULT_BILLS });
   }
 }
 

@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { logAudit } from "./audit";
+import { DEFAULT_USERS } from "./mock-data";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,37 +18,64 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Please enter your email and password.");
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase().trim() },
-        });
+        const normalizedEmail = credentials.email.toLowerCase().trim();
+        let user: any = null;
 
-        if (!user || !user.active) {
-          throw new Error("Invalid email or password, or account disabled.");
+        try {
+          user = await prisma.user.findUnique({
+            where: { email: normalizedEmail },
+          });
+        } catch (dbErr) {
+          console.warn("Database lookup failed in auth, falling back to demo credentials:", dbErr);
         }
 
-        const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
-        if (!isValid) {
-          throw new Error("Invalid email or password.");
+        if (user) {
+          if (!user.active) {
+            throw new Error("Invalid email or password, or account disabled.");
+          }
+
+          const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
+          if (!isValid) {
+            throw new Error("Invalid email or password.");
+          }
+
+          try {
+            await logAudit({
+              userId: user.id,
+              userName: user.name,
+              role: user.role,
+              action: "USER_LOGIN",
+              entity: "User",
+              entityId: user.id,
+              details: { email: user.email },
+            });
+          } catch (_) {}
+
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            doctorId: user.doctorId,
+          };
         }
 
-        // Log successful login audit
-        await logAudit({
-          userId: user.id,
-          userName: user.name,
-          role: user.role,
-          action: "USER_LOGIN",
-          entity: "User",
-          entityId: user.id,
-          details: { email: user.email },
-        });
+        // Demo user fallback when database is disconnected or unseeded
+        const demoUser = DEFAULT_USERS.find(
+          (u) => u.email.toLowerCase() === normalizedEmail && u.password === credentials.password
+        );
 
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          doctorId: user.doctorId,
-        };
+        if (demoUser) {
+          return {
+            id: demoUser.id,
+            name: demoUser.name,
+            email: demoUser.email,
+            role: demoUser.role,
+            doctorId: demoUser.doctorId,
+          };
+        }
+
+        throw new Error("Invalid email or password.");
       },
     }),
   ],

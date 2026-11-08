@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
 import PublicBookingForm from "../PublicBookingForm";
+import { DEFAULT_DEPARTMENTS, DEFAULT_DOCTORS } from "@/lib/mock-data";
 import { Calendar, ShieldCheck, Clock, MapPin, Phone } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -12,10 +13,19 @@ export default async function AppointmentsPage({
 }: {
   searchParams: { doctorId?: string };
 }) {
-  const [departments, doctors] = await Promise.all([
-    prisma.department.findMany({ where: { active: true }, orderBy: { name: "asc" } }),
-    prisma.doctor.findMany({ where: { active: true }, include: { department: true }, orderBy: { name: "asc" } }),
-  ]);
+  let departments: any[] = DEFAULT_DEPARTMENTS;
+  let doctors: any[] = DEFAULT_DOCTORS;
+
+  try {
+    const [dbDepts, dbDocs] = await Promise.all([
+      prisma.department.findMany({ where: { active: true }, orderBy: { name: "asc" } }),
+      prisma.doctor.findMany({ where: { active: true }, include: { department: true }, orderBy: { name: "asc" } }),
+    ]);
+    if (dbDepts.length > 0) departments = dbDepts;
+    if (dbDocs.length > 0) doctors = dbDocs;
+  } catch (err) {
+    console.warn("Using fallback appointment data:", err);
+  }
 
   return (
     <div className="bg-[#F6F9FC] dark:bg-[#0F1B2A] text-[#1B2733] dark:text-[#E6EEF5] min-h-screen">

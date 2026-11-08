@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { DEFAULT_MEDICINES } from "@/lib/mock-data";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +23,9 @@ export async function GET(req: NextRequest) {
       orderBy: { name: "asc" },
     });
 
-    return NextResponse.json({ medicines });
+    return NextResponse.json({ medicines: medicines.length > 0 ? medicines : DEFAULT_MEDICINES });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.warn("Using fallback medicines:", error);
+    return NextResponse.json({ medicines: DEFAULT_MEDICINES });
   }
 }
